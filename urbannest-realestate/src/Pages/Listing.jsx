@@ -3,15 +3,17 @@ import React, { useEffect, useState, useContext } from "react";
 import toast from "react-hot-toast";
 import { useParams } from "react-router-dom";
 import ImageSlider from "../components/ImageSlider";
-import { Bath, Bed, Ruler } from "lucide-react";
+import { Bath, Bed, Phone, Ruler } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../../context/userContext";
+import { IoIosCall, IoMdCall, IoMdMail } from "react-icons/io";
 
 const Listing = () => {
   const { setLoading, setSelectedChat, chats, setChats } =
     useContext(UserContext);
 
   const [listing, setListing] = useState(null);
+  const [listingUser, setListingUser] = useState(null);
   const navigate = useNavigate();
 
   const param = useParams();
@@ -26,6 +28,18 @@ const Listing = () => {
     };
     fetchListing();
   }, []);
+
+  useEffect(() => {
+    const fetchListingUser = async () => {
+      const { data } = await axios.get(`/user/${listing.userRef}`);
+      if (data.error) {
+        toast.error("Error fetching the user!");
+        return;
+      }
+      setListingUser(data);
+    };
+    fetchListingUser();
+  }, [listing]);
 
   const chatSeller = async () => {
     try {
@@ -59,19 +73,29 @@ const Listing = () => {
         <div className="max-w-[1200px] w-full h-[500px] my-4 mx-auto rounded-lg overflow-hidden">
           <ImageSlider imageUrls={listing?.images} />
         </div>
-        <div className="w-72 bg-gray px-5 py-3 rounded-lg flex items-center flex-col gap-5">
-          <h2 className="text-white text-2xl">
-            PKR <span className="font-bold text-3xl">{listing?.price}</span>
-          </h2>
-          <button
-            className="text-white font-bold bg-orange px-4 py-2 rounded-lg"
-            onClick={chatSeller}
-          >
-            Contact Seller
-          </button>
+        <div className="lg:w-72 bg-gray px-5 py-8 rounded-lg flex items-center lg:flex-col sm:flex-row flex-col gap-5 w-full">
+          <div>
+            <h2 className="text-white text-2xl">
+              PKR <span className="font-bold text-3xl">{listing?.price}</span>
+            </h2>
+            <button
+              className="text-white font-bold bg-orange px-4 py-2 rounded-lg"
+              onClick={chatSeller}
+            >
+              Contact Seller
+            </button>
+          </div>
+          <div>
+            <p className="flex items-center gap-3 text-white">
+              <IoMdCall /> {listingUser?.phone}
+            </p>
+            <p className="flex items-center gap-3 text-white">
+              <IoMdMail /> {listingUser?.email}
+            </p>
+          </div>
         </div>
       </div>
-      <div className="flex gap-4">
+      <div className="flex gap-4 my-5">
         <div className="flex items-center gap-2">
           <Bed color="white" />
           <span className="text-white">{listing?.bedrooms}</span>

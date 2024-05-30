@@ -7,7 +7,7 @@ import ChatHeader from "./singleChatComponents/ChatHeader";
 import ChatContainer from "./singleChatComponents/ChatContainer";
 import EmptyChat from "./singleChatComponents/EmptyChat";
 import ChatForm from "./singleChatComponents/ChatForm";
-import io from "socket.io-client";
+import { io } from "socket.io-client";
 
 const ENDPOINT = "http://localhost:8000";
 var socket, selectedChatCompare;
@@ -20,8 +20,7 @@ const SingleChat = ({ filterLoggedInUser }) => {
   const [typing, setTyping] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
 
-  const { selectedChat, setSelectedChat, user, setUser } =
-    useContext(UserContext);
+  const { selectedChat, setSelectedChat, user } = useContext(UserContext);
 
   const fetchChat = async () => {
     if (!selectedChat) return;
@@ -61,13 +60,17 @@ const SingleChat = ({ filterLoggedInUser }) => {
   };
 
   useEffect(() => {
-    socket = io(ENDPOINT);
-    socket.emit("setup", user);
-    socket.on("connected", () => setSocketConnected(true));
-    socket.on("typing", () => setIsTyping(true));
-    socket.on("stop typing", () => setIsTyping(false));
+    const initializeSocket = () => {
+      if (!user) return;
 
-    // eslint-disable-next-line
+      socket = io(ENDPOINT);
+      socket.emit("setup", user);
+      socket.on("connected", () => setSocketConnected(true));
+      socket.on("typing", () => setIsTyping(true));
+      socket.on("stop typing", () => setIsTyping(false));
+    };
+
+    initializeSocket();
   }, []);
 
   useEffect(() => {
@@ -77,15 +80,19 @@ const SingleChat = ({ filterLoggedInUser }) => {
   }, [selectedChat]);
 
   useEffect(() => {
-    socket.on("message recieved", (newMessageRecieved) => {
-      if (
-        !selectedChatCompare || // if chat is not selected or doesn't match current chat
-        selectedChatCompare._id !== newMessageRecieved.chat._id
-      ) {
-      } else {
-        setMessages([...messages, newMessageRecieved]);
-      }
-    });
+    const messageRecieved = () => {
+      if (!user) return;
+      socket.on("message recieved", (newMessageRecieved) => {
+        if (
+          !selectedChatCompare || // if chat is not selected or doesn't match current chat
+          selectedChatCompare._id !== newMessageRecieved.chat._id
+        ) {
+        } else {
+          setMessages([...messages, newMessageRecieved]);
+        }
+      });
+    };
+    messageRecieved();
   });
 
   const handleMsgChange = (e) => {

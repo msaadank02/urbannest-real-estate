@@ -58,7 +58,11 @@ function App() {
         },
         {
           path: "/register",
-          element: <Register />,
+          element: (
+            <ProtectRoute>
+              <Register />
+            </ProtectRoute>
+          ),
         },
         {
           path: "/login",

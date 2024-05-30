@@ -19,7 +19,7 @@ const ListingCard = ({ listing, className }) => {
           <span
             className={`${
               listing.purpose === "rent" ? "bg-orange" : "bg-gray"
-            } text-white text-sm font-semibold rounded-full absolute z-40 drop-shadow-lg bottom-3 left-3 px-3 flex items-center justify-center`}
+            } text-white text-sm font-semibold rounded-full absolute z-20 drop-shadow-lg bottom-3 left-3 px-3 flex items-center justify-center`}
           >
             {listing.purpose[0].toUpperCase() + listing.purpose.slice(1)}
           </span>

@@ -79,11 +79,9 @@ const ManageUsers = () => {
             changeHandler={changeHandler}
           />
         </div>
-        <div className="grid grid-cols-5 text-white">
-          <p className="text-white font-bold text-center">Profile</p>
-          <p className="text-white font-bold col-span-2 pl-16">Email</p>
-          <p className="text-white font-bold">Username</p>
-          <div />
+        <div className="grid grid-cols-5 text-white bg-gray py-3 mt-4 px-8">
+          <p className="text-white font-bold">Profile</p>
+          <p className="text-white font-bold col-span-3">User</p>
         </div>
       </div>
       {loading && (
@@ -130,20 +128,20 @@ const UsersList = ({
           })
           .map((user) => (
             <div
-              className="grid grid-cols-5 text-white border-b border-gray py-4"
+              className="grid grid-cols-5 text-white border-b border-gray py-4 px-8"
               key={user._id}
             >
-              <div className="flex justify-center">
+              <div>
                 <img
-                  src={user.avatar}
+                  src={user?.avatar}
                   alt=""
                   className="rounded-full w-12 h-12 object-contain"
                 />
               </div>
-              <p className="flex items-center h-full col-span-2">
-                {user.email}
+              <p className="flex flex-col justify-start h-full col-span-3">
+                <span>{user?.username}</span>
+                <span className="text-neutral-600">{user?.email}</span>
               </p>
-              <p className="flex items-center h-full">{user.username}</p>
               <button
                 className="flex items-center gap-2"
                 onClick={() => {

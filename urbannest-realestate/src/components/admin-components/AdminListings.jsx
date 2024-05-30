@@ -89,8 +89,6 @@ const AdminListings = () => {
     navigate(`/admin-dashboard/listing?${searchQuery}`);
   };
 
-  console.log(deleteListingFlag);
-
   async function deleteListing(id) {
     console.log(id);
     try {
@@ -121,7 +119,7 @@ const AdminListings = () => {
         {allListings &&
           allListings.length > 0 &&
           allListings.map((listing) => (
-            <div className="relative">
+            <div className="relative" key={listing._id}>
               <AiFillDelete
                 className="text-2xl absolute bottom-3 right-3 z-50 shadow-gray-600 drop-shadow text-lorange"
                 onClick={() => {

@@ -323,6 +323,17 @@ const deleteUsers = async(req, res) => {
     }
 }
 
+const getUserById = async(req, res) => {
+    const {id} = req.params
+    try {
+        const user = await User.findById({_id: id}, {password: 0})
+        res.status(200).json(user)
+    } catch (error) {
+        console.error(error)
+        res.json({error: 'Error getting user'})
+    }
+}
+
 module.exports = {
     test,
     registerUser,
@@ -335,5 +346,6 @@ module.exports = {
     testEmail,
     googleAuth,
     getAllUsers,
-    deleteUsers
+    deleteUsers,
+    getUserById
 }

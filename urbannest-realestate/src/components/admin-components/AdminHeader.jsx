@@ -11,7 +11,7 @@ const AdminHeader = ({ handleLogout, className }) => {
   const [dropDown, setDropDown] = useState(false);
 
   const stringShortner = (str) => {
-    const string = str.slice(0, 6);
+    const string = str?.slice(0, 6);
     return string;
   };
 

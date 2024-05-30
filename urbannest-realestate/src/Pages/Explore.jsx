@@ -106,7 +106,7 @@ const Explore = () => {
   return (
     <div className="flex-col flex md:flex-row">
       <form action="" onSubmit={handleSubmit}>
-        <div className="w-full flex items-center justify-center p-5 sticky top-16">
+        <div className="w-full flex items-center justify-center p-5">
           <input
             type="text"
             id="searchTerm"
