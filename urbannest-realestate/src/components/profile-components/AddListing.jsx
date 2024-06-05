@@ -7,13 +7,6 @@ import {
   ref,
   uploadBytesResumable,
 } from "firebase/storage";
-import {
-  APIProvider,
-  Map,
-  AdvancedMarker,
-  Pin,
-  InfoWindow,
-} from "@vis.gl/react-google-maps";
 import { app } from "../../firebase";
 import { X } from "lucide-react";
 import toast from "react-hot-toast";
@@ -189,8 +182,6 @@ const AddListing = () => {
         handleInputChange={handleInputChange}
       />
 
-      <GoogleMapsIntegration />
-
       <PriceAndArea
         handleInputChange={handleInputChange}
         listingData={listingData}
@@ -227,19 +218,6 @@ const AddListing = () => {
     </form>
   );
 };
-
-function GoogleMapsIntegration() {
-  // lat: 31.513 lng: 74.361
-  const position = { lat: 31.513, lng: 74.361 };
-
-  return (
-    <APIProvider apiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}>
-      <div style={{ height: "100vh" }}>
-        <Map zoom={12} center={position}></Map>
-      </div>
-    </APIProvider>
-  );
-}
 
 function PurposeAndType({
   selectChange,

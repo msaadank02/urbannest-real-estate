@@ -2,7 +2,7 @@ import { NavLink, Link, useLocation } from "react-router-dom";
 import logo from "../assets/Images/urbannestNavbar.png";
 import logoIcon from "../assets/Images/urbannestIcon.png";
 import { navLinks } from "../data/data";
-import { ChevronDown, MenuIcon, Power } from "lucide-react";
+import { ChevronDown, MenuIcon } from "lucide-react";
 import { useState, useContext, useEffect } from "react";
 import Sidenavbar from "./Sidenavbar";
 import axios from "axios";
@@ -12,13 +12,12 @@ import { ProfileContext } from "../../context/profileContext";
 import { useNavigate } from "react-router-dom";
 import Toggle from "./Toggle";
 import * as React from "react";
-import Button from "@mui/material/Button";
-import Menu from "@mui/material/Menu";
-import MenuItem from "@mui/material/MenuItem";
 
 const Header = ({ handleLogout }) => {
   const [showSidebar, setShowSidebar] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
+  const [openMenu, setOpenMenu] = useState(false);
+  const refMenu = React.useRef();
 
   const { user } = useContext(UserContext);
 
@@ -53,6 +52,19 @@ const Header = ({ handleLogout }) => {
       toast.error("Error becoming a seller!");
     }
   };
+
+  useEffect(() => {
+    let handler = (e) => {
+      if (!refMenu.current.contains(e.target)) {
+        setOpenMenu(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+
+    return () => {
+      document.removeEventListener("mousedown", handler);
+    };
+  });
 
   const location = useLocation();
 
@@ -144,51 +156,66 @@ const Header = ({ handleLogout }) => {
             </p>
             <Toggle />
           </div>
-          <Link to={"/profile"}>
-            <img
-              src={user?.avatar}
-              className=" w-10 h-10 object-cover rounded-full"
-            />
-          </Link>
-          <div>
-            <Button
-              id="basic-button"
-              aria-controls={open ? "basic-menu" : undefined}
-              aria-haspopup="true"
-              aria-expanded={open ? "true" : undefined}
-              onClick={handleClick}
-              open
-              sx={{
-                padding: 0,
-                margin: 0,
-              }}
-            >
-              <ChevronDown className="text-white" />
-            </Button>
-            <Menu
-              id="basic-menu"
-              anchorEl={anchorEl}
-              open={open}
-              onClose={handleClose}
-              MenuListProps={{
-                "aria-labelledby": "basic-button",
-              }}
-            >
-              <MenuItem className="flex gap-2">
-                <img className="rounded-full w-8" src={user?.avatar} alt="" />
-                {user?.username}
-              </MenuItem>
-              <Link
-                to={"/admin-dashboard"}
-                className={`${user?.roles?.name === "admin" ? "" : "hidden"}`}
+          <div className="flex items-center gap-2">
+            <Link to={"/profile"}>
+              <img
+                src={user?.avatar}
+                className=" w-10 h-10 object-cover rounded-full"
+              />
+            </Link>
+            <div className="relative" ref={refMenu}>
+              <ChevronDown
+                onClick={() => setOpenMenu(!openMenu)}
+                className="text-white cursor-pointer"
+              />
+              <div
+                className={`${
+                  openMenu
+                    ? "opacity-1 visible translate-y-0 translate-x-0"
+                    : "invisible opacity-0 -translate-y-4 "
+                } transition-all duration-300 ease-in-out absolute top-12 right-2  bg-gray-600 rounded-lg`}
               >
-                <MenuItem onClick={handleClose}>Admin Pannel</MenuItem>
-              </Link>
-              <Link to={"/profile"}>
-                <MenuItem onClick={handleClose}>Profile</MenuItem>
-              </Link>
-              <MenuItem onClick={handleLogout}>Logout</MenuItem>
-            </Menu>
+                <div className="flex flex-col gap-2 items-center w-full px-8 py-3 border-b-[1px] border-b-light-gray ">
+                  <img
+                    src={user?.avatar}
+                    alt={"profile"}
+                    className="w-14  rounded-full"
+                  />
+                  <div>
+                    <p className="leading-5 text-center mt-2">
+                      @{user?.username}
+                    </p>
+                    <p className="italic text-[#c7c7c7r] text-xs">
+                      {user?.email}
+                    </p>
+                  </div>
+                </div>
+                <Link
+                  to={"/admin-dashboard"}
+                  className={`${
+                    user?.roles?.name === "admin"
+                      ? "px-4 py-2 border border-b-[1px] border-b-light-gray"
+                      : "hidden"
+                  }`}
+                >
+                  <div onClick={handleClose}>Admin Pannel</div>
+                </Link>
+                <Link to={"/profile"}>
+                  <div
+                    className=" px-4 py-2 border-b-[1px] border-b-light-gray"
+                    onClick={handleClose}
+                  >
+                    Profile
+                  </div>
+                </Link>
+                <div
+                  onClick={handleLogout}
+                  className="cursor-pointer px-4 py-2 "
+                >
+                  Logout
+                </div>
+              </div>
+            </div>
           </div>
         </ul>
         <div className="lg:hidden text-white">

@@ -9,7 +9,7 @@ const ListingCard = ({ listing, className }) => {
     <div
       className={`${
         className || ""
-      } bg-gray relative rounded-lg overflow-hidden w-full pb-3 border border-gray-600`}
+      } bg-gray relative rounded-lg overflow-hidden w-full pb-3 `}
     >
       <Link
         className="bg-gray z-50 text-light-gray"

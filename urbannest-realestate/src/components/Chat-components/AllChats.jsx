@@ -17,30 +17,25 @@ const AllChats = ({ filterLoggedInUser }) => {
     setChats,
   } = useContext(UserContext);
 
-  const fetchChats = async () => {
-    try {
-      setLoading(true);
-      const { data } = await axios.get("/fetch-chats");
-      if (data.error) {
-        setLoading(false);
-        toast.error(data.error);
-      }
-      setLoading(false);
-      setChats(data);
-    } catch (error) {
-      setLoading(false);
-      console.error(error);
-    }
-  };
-
   useEffect(() => {
-    // setLoggedUser(JSON.parse(localStorage))
+    const fetchChats = async () => {
+      try {
+        setLoading(true);
+        const { data } = await axios.get("/fetch-chats");
+        console.log(data);
+        if (data.error) {
+          setLoading(false);
+          toast.error(data.error);
+        }
+        setLoading(false);
+        setChats(data);
+      } catch (error) {
+        setLoading(false);
+        console.error(error);
+      }
+    };
     fetchChats();
   }, []);
-  console.log(selectedChat);
-  console.log(chats);
-
-  console.log(chats.length);
 
   return (
     <div
@@ -56,19 +51,15 @@ const AllChats = ({ filterLoggedInUser }) => {
             Loading chats
           </div>
         )}
-        {chats &&
-        chats.length > 0 &&
-        chats?.[0]?.users.length > 1 &&
-        !loading ? (
+        {chats && chats.length > 0 && !loading ? (
           chats.map((chat, index) => (
             <ChatCard
               className={`${selectedChat === chat ? "bg-gray-600" : ""}`}
               onClick={() => setSelectedChat(chat)}
-              image={filterLoggedInUser(chat)[0].avatar}
-              username={filterLoggedInUser(chat)[0].username}
+              image={filterLoggedInUser(chat)[0]?.avatar}
+              username={filterLoggedInUser(chat)[0]?.username}
               key={index}
             />
-            // <p key={index}>{chat?.users?.[1]?.username}</p>
           ))
         ) : !loading && chats.length === 0 ? (
           <p>No chats</p>

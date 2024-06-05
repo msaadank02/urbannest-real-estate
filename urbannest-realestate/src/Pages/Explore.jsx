@@ -5,6 +5,8 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import ListingCard from "../components/ListingCard";
 import Loader from "../components/Loader";
+import { checkboxData } from "../data/checkboxInputData";
+import { motion } from "framer-motion";
 
 const label = { inputProps: { "aria-label": "Checkbox demo" } };
 
@@ -14,27 +16,43 @@ const Explore = () => {
   const [sidebarData, setSidebarData] = useState({
     searchTerm: "",
     purpose: "all",
+    type: "%5B%5D",
     sort: "created_at",
     order: "desc",
   });
   const [loading, setLoading] = useState(false);
   const [listings, setListings] = useState([]);
   const [showMore, setShowMore] = useState(false);
+  const [typeArray, setTypeArray] = useState([]);
 
   useEffect(() => {
     const urlParams = new URLSearchParams(location.search);
     const searchTermFromUrl = urlParams.get("searchTerm");
     const purposeFromUrl = urlParams.get("purpose");
+    const typeFromUrl = urlParams.get("type");
     const sortFromUrl = urlParams.get("sort");
     const orderFromUrl = urlParams.get("order");
 
-    if (searchTermFromUrl || purposeFromUrl || sortFromUrl || orderFromUrl) {
+    if (
+      searchTermFromUrl ||
+      purposeFromUrl ||
+      sortFromUrl ||
+      orderFromUrl ||
+      typeFromUrl
+    ) {
       setSidebarData({
         searchTerm: searchTermFromUrl || "",
         purpose: purposeFromUrl || "all",
+        type: typeFromUrl || "%5B%5D",
         sort: sortFromUrl || "created_at",
         order: orderFromUrl || "desc",
       });
+    }
+    console.log(typeFromUrl);
+    if (typeFromUrl) {
+      let decodedListingType = JSON.parse(decodeURIComponent(typeFromUrl));
+      console.log(decodedListingType);
+      setTypeArray(decodedListingType);
     }
     const fetchListings = async () => {
       try {
@@ -74,12 +92,39 @@ const Explore = () => {
     }
   };
 
+  const listingTypeHandleChange = (e, parent) => {
+    let key = `type.${parent}`;
+    let value = e.target.name;
+    if (!e.target.checked) {
+      setTypeArray((prevArray) => {
+        const newArray = prevArray.filter((item) => item[key] !== value);
+        updateSidebarData(newArray);
+        return newArray;
+      });
+      return;
+    }
+
+    setTypeArray((prevArray) => {
+      const newArray = [...prevArray, { [key.toString()]: value }];
+      updateSidebarData(newArray);
+      return newArray;
+    });
+  };
+  console.log(typeArray);
+  console.log(sidebarData.type);
+
+  const updateSidebarData = (updatedArray) => {
+    let encodedUriArray = encodeURIComponent(JSON.stringify(updatedArray));
+    setSidebarData((prevData) => ({ ...prevData, type: encodedUriArray }));
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
     const urlParams = new URLSearchParams();
     urlParams.set("searchTerm", sidebarData.searchTerm);
     urlParams.set("purpose", sidebarData.purpose);
+    urlParams.set("type", sidebarData.type);
     urlParams.set("sort", sidebarData.sort);
     urlParams.set("order", sidebarData.order);
     const searchQuery = urlParams.toString();
@@ -105,7 +150,7 @@ const Explore = () => {
 
   return (
     <div className="flex-col flex md:flex-row">
-      <form action="" onSubmit={handleSubmit}>
+      <form action="" onSubmit={handleSubmit} className="lg:w-[25%] md:w-[30%]">
         <div className="w-full flex items-center justify-center p-5">
           <input
             type="text"
@@ -119,79 +164,77 @@ const Explore = () => {
             <FaSearch color="white" />
           </button>
         </div>
-        <div className="md:w-[30%] lg:w-[25%] px-4 pl-8">
-          <div className="md:min-h-screen flex md:flex-col gap-3 flex-wrap bg-darkgray">
-            <div className="flex items-center gap-3">
+        <div className="px-4 pl-8 w-full">
+          <div className="md:min-h-screen flex md:flex-col gap-1 flex-wrap bg-darkgray w-full">
+            <div className="flex items-center gap-3 pb-4">
               <FaFilter color="white" />
               <h2 className="text-white text-xl font-bold">Filters:</h2>
             </div>
-            <div className="flex gap-x-3 gap-y-0 flex-wrap">
-              <div className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  id="all"
-                  name="all"
-                  checked={sidebarData.purpose === "all"}
+            <div className="flex gap-x-3 flex-wrap">
+              <CheckboxInput
+                id={"all"}
+                name={"all"}
+                sidebarData={sidebarData}
+                handleChange={handleChange}
+                value={"Sell & Rent"}
+                purpose={"all"}
+                htmlFor={"all"}
+              />
+              <CheckboxInput
+                id={"sell"}
+                name={"sell"}
+                sidebarData={sidebarData}
+                handleChange={handleChange}
+                value={"Sell"}
+                purpose={"sell"}
+                htmlFor={"sell"}
+              />
+              <CheckboxInput
+                id={"rent"}
+                name={"rent"}
+                sidebarData={sidebarData}
+                handleChange={handleChange}
+                value={"Rent"}
+                purpose={"rent"}
+                htmlFor={"rent"}
+              />
+            </div>
+            <div className="flex flex-col gap-3">
+              {checkboxData.map((item) => {
+                return (
+                  <CheckboxTypeFilters
+                    item={item}
+                    parent={item.name}
+                    onChange={listingTypeHandleChange}
+                    typeArray={typeArray}
+                  />
+                );
+              })}
+            </div>
+            <div className="flex gap-2 mt-3 md:flex-col">
+              <div className="">
+                <select
+                  name="sort"
+                  id="sort_order"
+                  defaultValue={`created_at_desc`}
                   onChange={handleChange}
-                  className="peer relative appearance-none w-5 h-5 border border-orange rounded-md cursor-pointer focus:outline-none checked:bg-orange hover:ring-1 hover:ring-orange after:contemt-[''] after:w-full after:h-full after:top-0 after:left-0"
-                />
-                <label
-                  htmlFor="all"
-                  className="text-white text-lg cursor-pointer"
+                  className="bg-gray-600 text-white rounded-md px-3 py-2 cursor-pointer focus:outline-none focus:ring-1 focus:ring-orange"
                 >
-                  Sell & Rent
-                </label>
+                  <option value="createdAt_desc">Latest</option>
+                  <option value="price_desc">Price high to low</option>
+                  <option value="price_asc">Price low to high</option>
+                  <option value="createdAt_asc">Oldest</option>
+                </select>
               </div>
-              <div className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  id="sell"
-                  name="sell"
-                  checked={sidebarData.purpose === "sell"}
-                  onChange={handleChange}
-                  className="peer relative appearance-none w-5 h-5 border border-orange rounded-md cursor-pointer focus:outline-none checked:bg-orange hover:ring-1 hover:ring-orange after:contemt-[''] after:w-full after:h-full after:top-0 after:left-0"
-                />
-                <label
-                  htmlFor="sell"
-                  className="text-white text-lg cursor-pointer"
+              <div>
+                <motion.button
+                  whileTap={{ backgroundColor: "#d44e00", scale: 0.9 }}
+                  className="text-white bg-orange px-6 py-2 rounded-md font-bold"
                 >
-                  Sell
-                </label>
-              </div>
-              <div className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  id="rent"
-                  name="rent"
-                  checked={sidebarData.purpose === "rent"}
-                  onChange={handleChange}
-                  className="peer relative appearance-none w-5 h-5 border border-orange rounded-md cursor-pointer focus:outline-none checked:bg-orange hover:ring-1 hover:ring-orange after:contemt-[''] after:w-full after:h-full after:top-0 after:left-0"
-                />
-                <label
-                  htmlFor="rent"
-                  className="text-white text-lg cursor-pointer"
-                >
-                  Rent
-                </label>
+                  Apply filters
+                </motion.button>
               </div>
             </div>
-            <div>
-              <select
-                name="sort"
-                id="sort_order"
-                defaultValue={`created_at_desc`}
-                onChange={handleChange}
-                className="bg-gray-600 text-white rounded-md px-3 py-2 cursor-pointer focus:outline-none focus:ring-1 focus:ring-orange"
-              >
-                <option value="createdAt_desc">Latest</option>
-                <option value="price_desc">Price high to low</option>
-                <option value="price_asc">Price low to high</option>
-                <option value="createdAt_asc">Oldest</option>
-              </select>
-            </div>
-            <button className="text-white bg-orange px-4 rounded-md font-bold">
-              Apply filters
-            </button>
           </div>
         </div>
       </form>
@@ -230,3 +273,71 @@ const Explore = () => {
 };
 
 export default Explore;
+
+const CheckboxInput = ({
+  id,
+  name,
+  sidebarData,
+  handleChange,
+  value,
+  purpose,
+  htmlFor,
+}) => {
+  return (
+    <div className="flex items-center gap-2">
+      <input
+        type="checkbox"
+        id={id}
+        name={name}
+        checked={sidebarData.purpose === purpose}
+        onChange={handleChange}
+        className="peer relative appearance-none w-5 h-5 border border-orange rounded-md cursor-pointer focus:outline-none checked:bg-orange hover:ring-1 hover:ring-orange after:contemt-[''] after:w-full after:h-full after:top-0 after:left-0"
+      />
+      <label htmlFor={htmlFor} className="text-white text-lg cursor-pointer">
+        {value}
+      </label>
+    </div>
+  );
+};
+
+const CheckboxTypeFilters = ({ item, parent, onChange, typeArray }) => {
+  if (item.parent) {
+    return (
+      <div className="text-neutral-600">
+        <h3 className="text-lg font-semibold">
+          {item.name[0].toUpperCase()}
+          {item?.name.slice(1)}
+        </h3>
+        <div className="flex w-full flex-wrap gap-2">
+          {item.items.map((child) => (
+            <CheckboxTypeFilters
+              item={child}
+              parent={parent}
+              onChange={onChange}
+              typeArray={typeArray}
+            />
+          ))}
+        </div>
+      </div>
+    );
+  } else {
+    const checked = typeArray.some(
+      (obj) => obj[`type.${parent}`] === item.name
+    );
+    return (
+      <div className="flex items-center gap-1">
+        <input
+          type="checkbox"
+          id={item.id}
+          name={item.name}
+          checked={checked}
+          onChange={(e) => onChange(e, parent)}
+          className="peer relative appearance-none w-4 h-4 border border-orange rounded cursor-pointer focus:outline-none checked:bg-orange hover:ring-1 hover:ring-orange after:contemt-[''] after:w-full after:h-full after:top-0 after:left-0"
+        />
+        <label htmlFor={item.id} className="text-white cursor-pointer text-sm">
+          {item.name}
+        </label>
+      </div>
+    );
+  }
+};

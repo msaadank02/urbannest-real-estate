@@ -40,12 +40,12 @@ const Toggle = () => {
         handleToggling();
       }}
       className={`${
-        toggle ? "bg-orange" : "bg-light-gray"
+        toggle ? "bg-orange" : "bg-white"
       } cursor-pointer flex rounded-full w-9 h-[1.3rem] p-[0.1rem] transition-all duration-300`}
     >
       <div
         className={`${
-          toggle ? "translate-x-full bg-light-gray" : "translate-x-0 bg-orange"
+          toggle ? "translate-x-full bg-white" : "translate-x-0 bg-orange"
         } rounded-full h-full w-1/2 transition-all duration-300 `}
       />
     </div>

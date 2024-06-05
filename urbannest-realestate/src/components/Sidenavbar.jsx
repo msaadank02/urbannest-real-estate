@@ -99,7 +99,7 @@ const Sidebar = ({
           <ul
             className={`${
               user && user?.seller ? "flex" : "hidden"
-            } items-center justify-center text-white gap-10 w-full border-y-[1px] border-darkgray py-3`}
+            } items-center justify-center text-white gap-10 w-full border-y-[1px] border-gray-600 border-t-[1px] border-b-0 py-4`}
           >
             <Link to={"/profile"} className="flex gap-3 items-center">
               <p>{`Switch to ${
@@ -111,7 +111,7 @@ const Sidebar = ({
           <ul
             className={`${
               user ? "flex" : "hidden"
-            } items-center justify-center text-white gap-10 w-full border-y-[1px] border-darkgray py-3`}
+            } items-center justify-center text-white gap-10 w-full border-y-[1px] border-gray-600 py-3`}
           >
             <Link to={"/profile"} className="flex gap-3 items-center">
               <img

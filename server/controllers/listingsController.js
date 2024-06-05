@@ -16,9 +16,12 @@ const createListing = async (req, res) => {
 
 const getListings = async (req, res) => {
 
+    const sort = req.query.sort || 'createdAt';
+    const order = req.query.order || 'desc';
+
     if(req.body._id.toString() === req.params.id){
         try {
-            const listings = await Listing.find({userRef: req.params.id}).exec()
+            const listings = await Listing.find({userRef: req.params.id}).sort({[sort]: order}).exec()
             return res.status(200).json(listings)
         } catch (error) {
             console.log(error);
@@ -107,23 +110,35 @@ const getAllListings = async(req, res) => {
             purpose = { $in: ['sell', 'rent'] }
         }
 
+        
         const searchTerm = req.query.searchTerm || '';
         const sort = req.query.sort || 'createdAt';
         const order = req.query.order || 'desc';
-
-        const listings = await Listing.find({
+        
+        let type = req.query.type
+        
+        const filter = {
             title: { $regex: searchTerm, $options: 'i' },
-            purpose: purpose
-          }).sort({ [sort]: order })
+            purpose: purpose,
+        }
+        
+        if(type && type !== '%5B%5D'){
+            try {
+                type = decodeURIComponent(type)
+                type = JSON.parse(type)
+            } catch (error) {
+                console.log('Invalid json object')
+            }
+                filter.$or = type
+        }
+        const listings = await Listing.find(filter).sort({ [sort]: order })
             .limit(limit)
             .skip(startIndex).exec();
          
-        console.log(listings.length)
-
         res.status(200).json(listings)
 
     } catch (error) {
-        res.status(404).json({error: "Error fetching the user"})
+        res.status(404).json({error: "Error fetching the Listings"})
     }
 }
 

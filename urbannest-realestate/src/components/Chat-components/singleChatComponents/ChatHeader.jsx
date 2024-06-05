@@ -22,11 +22,11 @@ const ChatHeader = ({
         {selectedChat ? (
           <div className="flex items-center gap-2">
             <img
-              src={filterLoggedInUser(selectedChat)[0].avatar}
+              src={filterLoggedInUser(selectedChat)[0]?.avatar}
               className="w-8 h-8 rounded-full "
               alt=""
             />
-            <p>{filterLoggedInUser(selectedChat)[0].username}</p>
+            <p>{filterLoggedInUser(selectedChat)[0]?.username}</p>
           </div>
         ) : (
           "Single Chat"

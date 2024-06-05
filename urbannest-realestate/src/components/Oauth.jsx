@@ -20,6 +20,8 @@ const Oauth = () => {
 
       const result = await signInWithPopup(auth, provider);
 
+      console.log(result.user);
+
       const { data } = await axios.post("/auth/google", {
         name: result.user.displayName,
         email: result.user.email,

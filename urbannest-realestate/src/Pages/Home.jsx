@@ -10,13 +10,18 @@ import FeatureCards from "../components/Home-page-components/FeatureCards";
 import { getToken } from "../Middleware/cookies";
 import { useEffect, useRef, useState } from "react";
 import { motion, useInView, useAnimation } from "framer-motion";
+import useFetch from "../useFetch";
+import ListingCard from "../components/ListingCard";
+import Loader from "../components/Loader";
 
 const Home = () => {
   return (
     <div className="py-10 px-5 lg:px-10">
       <Hero />
       <Features />
+      <RecentListings purpose={"sell"} />
       <Hero2 />
+      <RecentListings purpose={"rent"} />
     </div>
   );
 };
@@ -212,11 +217,63 @@ const Features = () => {
     );
 };
 
+const RecentListings = ({ purpose }) => {
+  const searchQuerry = `searchTerm=&purpose=${purpose}&sort=created_at&order=desc&limit=4`;
+  const { data, loading, error } = useFetch(`/explore?${searchQuerry}`);
+
+  return (
+    <div
+      className={`${
+        data ? "flex" : "hidden"
+      } text-white  flex-col py-10 sm:px-20`}
+    >
+      <h2 className="font-semibold text-xl">
+        Recent {purpose === "sell" ? "Selling" : "Rental"} Properties
+      </h2>
+      <div
+        className={`${
+          loading ? "flex items-center justify-center" : "grid"
+        } py-5 grid-cols-[repeat(auto-fill,minmax(300px,1fr))] max-sm:flex flex-col w-full gap-2`}
+      >
+        {!loading && data?.length === 0 && (
+          <p className="text-white text-xl">No listings found</p>
+        )}
+        {loading && (
+          <div className="flex items-center justify-center w-full gap-2 mt-4">
+            <Loader width={"w-[30px]"} />
+            <p className="text-white">Fetching Properties</p>
+          </div>
+        )}
+        {!loading &&
+          data?.length > 0 &&
+          data.map((listing, i) => (
+            <motion.div
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0, transition: { delay: i * 0.2 } }}
+              viewport={{ once: true }}
+            >
+              <ListingCard key={listing._id} listing={listing} />
+            </motion.div>
+          ))}
+      </div>
+      {!loading && data?.length > 0 && (
+        <Link
+          className="w-full flex justify-center text-orange"
+          to={`/explore?searchTerm=&purpose=${purpose}&sort=created_at&order=desc&limit=9`}
+        >
+          {" "}
+          Explore More
+        </Link>
+      )}
+    </div>
+  );
+};
+
 const Hero2 = () => {
   const title = "Discover the benefits of our".split(" ");
 
   return (
-    <section className="xl:px-44 md:px-14 sm:px-8 px-2">
+    <section className="xl:px-44 md:px-14 sm:px-8 px-2 py-10">
       <motion.div className="flex xl:justify-between justify-center items-center flex-col lg:flex-row gap-10 mt-8 xl:mt-0 max-w-7xl">
         <div className="flex items-center justify-center fade-in">
           <motion.div

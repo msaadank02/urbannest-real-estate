@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 const FormInput = (props) => {
-  const { errorMessage, handleChange, id, ...inputProps } = props;
+  const { className, errorMessage, handleChange, id, ...inputProps } = props;
 
   const [focused, setFocused] = useState(false);
 
@@ -10,9 +10,9 @@ const FormInput = (props) => {
   };
 
   return (
-    <div className="mt-4 flex flex-col w-full text-light-gray">
+    <div className="mt-4 flex flex-col w-full text-white">
       <input
-        className="reg-signin-input"
+        className={`reg-signin-input ${className || ""}`}
         {...inputProps}
         onChange={handleChange}
         onBlur={handleFocus}

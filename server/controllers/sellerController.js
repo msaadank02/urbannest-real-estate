@@ -28,7 +28,7 @@ const profileImageUpload = async(req, res) => {
         jwt.verify(token, process.env.JWT_SECRET, {}, async (err, user) => {
             if(err) throw err;
 
-            const updatedUser = await User.findOneAndUpdate({_id: user.id}, { $set: {
+            const updatedUser = await User.findOneAndUpdate({_id: user._id}, { $set: {
                 avatar: avatar
             }}).exec()
             if(updatedUser){

@@ -14,7 +14,7 @@ import {
 import { app } from "../../firebase";
 
 const UserInfo = ({ className }) => {
-  const { user } = useContext(UserContext);
+  const { user, setUser } = useContext(UserContext);
 
   const fileRef = useRef(null);
   const [file, setFile] = useState(undefined);
@@ -62,6 +62,7 @@ const UserInfo = ({ className }) => {
         setFilePercentage(Math.round(progress));
       },
       (error) => {
+        console.error("File upload error: ", error); // Add error logging here
         setFileError(true);
       },
       () => {
@@ -69,10 +70,12 @@ const UserInfo = ({ className }) => {
           setProfileData((prev) => ({ ...prev, avatar: downloadUrl }));
 
           try {
+            console.log("Download URL:", downloadUrl); // Logging download URL
             const { data } = await axios.patch("/upload-profile-image", {
               avatar: downloadUrl,
             });
-            console.log(data);
+            setUser((prev) => ({ ...prev, avatar: downloadUrl }));
+            console.log("Backend response:", data); // Logging backend response
             if (data.error) {
               toast.error(data.error);
             } else {
@@ -80,12 +83,11 @@ const UserInfo = ({ className }) => {
               navigate("/profile");
             }
           } catch (error) {
-            console.error(error);
+            console.error("Error updating profile image: ", error); // More detailed error logging
           }
         });
       }
     );
-    console.log(filePercentage);
   };
 
   useEffect(() => {
@@ -234,7 +236,7 @@ const UserInfo = ({ className }) => {
                 disable || input.name === "email"
                   ? " text-center bg-gray "
                   : "bg-orange bg-opacity-10"
-              } rounded-lg text-xl text-light-gray p-2 focus:outline-none focus:ring-1 focus:ring-orange`}
+              } rounded-lg text-xl text-[#dddddd] p-2 focus:outline-none focus:ring-1 focus:ring-orange`}
               name={input.name}
               value={profileData[input.name]}
               placeholder={input.placeholder}

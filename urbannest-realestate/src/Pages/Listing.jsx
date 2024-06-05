@@ -67,7 +67,7 @@ const Listing = () => {
   console.log(listing);
 
   return (
-    <div className="py-10 xl:px-32 px-16">
+    <div className="py-10 xl:px-32 md:px-16 px-4">
       <h2 className="text-white font-bold text-xl">{listing?.title}</h2>
       <div className="flex gap-3 flex-col lg:flex-row">
         <div className="max-w-[1200px] w-full h-[500px] my-4 mx-auto rounded-lg overflow-hidden">

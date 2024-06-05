@@ -46,23 +46,23 @@ const ScrollableMessages = ({ messages }) => {
 
   if (selectedChat)
     return (
-      <div className="flex flex-col gap-1">
+      <div className="flex flex-col gap-1  w-full">
         {messages &&
           messages.length > 0 &&
           messages.map((m, i) => (
             <div
               key={i}
               className={`${
-                filterOtherUser(selectedChat)[0]._id === m.sender._id
+                filterOtherUser(selectedChat)[0]?._id === m.sender._id
                   ? "flex justify-end"
                   : "flex"
               } `}
             >
-              {(isSameSender(messages, m, i, user._id) ||
-                isLastMessage(messages, i, user._id)) && (
+              {(isSameSender(messages, m, i, user?._id) ||
+                isLastMessage(messages, i, user?._id)) && (
                 <div className="flex items-center gap-2">
                   <img
-                    src={m.sender.avatar}
+                    src={m?.sender?.avatar}
                     alt={"profile"}
                     className="w-8 h-8 object-contain rounded-full"
                   />
@@ -70,15 +70,15 @@ const ScrollableMessages = ({ messages }) => {
               )}
               <p
                 className={`${
-                  m.sender._id === user._id
+                  m.sender?._id === user?._id
                     ? "bg-gray-600 px-2 py-1 rounded-md"
                     : "bg-orange px-2 py-1 rounded-md bg-opacity-30"
                 } max-w-[75%] `}
                 style={{
-                  marginLeft: isSameSenderMargin(messages, m, i, user._id),
+                  marginLeft: isSameSenderMargin(messages, m, i, user?._id),
                 }}
               >
-                {m.content}
+                {m?.content}
               </p>
             </div>
           ))}
