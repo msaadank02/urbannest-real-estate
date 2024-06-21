@@ -9,25 +9,29 @@ const authMiddleware = async(req,res,next)=>{
         if(!token){
             return res.json(null)
         }
-        jwt.verify(token, process.env.JWT_SECRET, {}, async (err, user) => {
-            if(err) throw err;
-            const data = await User.findOne({_id: user._id}).exec()
-            if(!data) return res.json({error: "No user found"})
-            
-            const roles = await RoleModel.findOne({_id: data.roles[0]}).exec()
+        jwt.verify(token, process.env.JWT_SECRET, {}, async (err, decoded) => {
+            if (err) {
+                return res.status(401).json({ error: 'Unauthorized: Invalid token' });
+            }
+            const user = await User.findById(decoded._id)
+                        .populate('roles')
+                        .exec()
 
-            user = {...user,
-                avatar: data.avatar,
-                username: data.username,
-                _id: data._id,
-                seller: data.seller,
-                roles: roles,
-                fullName: data.fullName,
-                city: data.city,
-                phone: data.phone
+            if(!user) return res.status(404).json({error: "No user found"})
+            
+            req.user = {
+                _id: user._id,
+                username: user.username,
+                email: user.email,
+                avatar: user.avatar,
+                seller: user.seller,
+                roles: user.roles,
+                fullName: user.fullName,
+                city: user.city,
+                phone: user.phone,
+                favorites: user.favorites
             }
 
-            req.body = user
             next()
         })
 
@@ -37,7 +41,7 @@ const authMiddleware = async(req,res,next)=>{
 }
 
 const verifySellingProfile = async (req, res, next) => {
-    const user = req.body
+    const user = req.user
     try {
         if(!user){
             res.json({error: "You are not logged in"});
@@ -47,7 +51,7 @@ const verifySellingProfile = async (req, res, next) => {
             return res.json({uncomplete: "Please complete your profile"})
         }
         
-        req.body = user
+        req.user = user
         next()
         
     } catch (error) {

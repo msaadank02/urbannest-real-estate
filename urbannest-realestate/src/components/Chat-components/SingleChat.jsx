@@ -18,8 +18,14 @@ const SingleChat = ({ filterLoggedInUser }) => {
   const [typing, setTyping] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
 
-  const { selectedChat, setSelectedChat, user, setUser } =
-    useContext(UserContext);
+  const {
+    selectedChat,
+    setSelectedChat,
+    user,
+    setUser,
+    notifications,
+    setNotifications,
+  } = useContext(UserContext);
 
   const socket = useRef(null);
 
@@ -34,6 +40,37 @@ const SingleChat = ({ filterLoggedInUser }) => {
       socket.current.emit("join chat", selectedChat._id);
     } catch (error) {
       toast.error("Error fetching the chat");
+      setLoading(false);
+    }
+  };
+
+  const deletedSelectedChatNotifications = async () => {
+    if (!selectedChat) return;
+
+    try {
+      setLoading(true);
+      const { data } = await axios.post(`/enter-chat`, {
+        chatId: selectedChat._id,
+      });
+      setNotifications(data);
+      setLoading(false);
+    } catch (error) {
+      toast.error("Error deleting the notifications");
+      setLoading(false);
+    }
+  };
+
+  const leaveChat = async () => {
+    if (!selectedChat) return;
+    try {
+      setLoading(true);
+      const { data } = await axios.post(`/leave-chat`, {
+        chatId: selectedChat._id,
+      });
+      console.log(data);
+      setLoading(false);
+    } catch (error) {
+      toast.error("Error deleting the notifications");
       setLoading(false);
     }
   };
@@ -81,13 +118,30 @@ const SingleChat = ({ filterLoggedInUser }) => {
 
   useEffect(() => {
     fetchChat();
+    deletedSelectedChatNotifications();
   }, [selectedChat]);
 
   useEffect(() => {
+    const getNotification = async () => {
+      try {
+        const { data } = await axios.get("/get-notification");
+        if (data.error) {
+          toast.error("Error getting notifications");
+        }
+        setNotifications(data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
     if (socket.current) {
       socket.current.on("message recieved", (newMessageRecieved) => {
         if (!selectedChat || selectedChat._id !== newMessageRecieved.chat._id) {
-          // Handle notification for new messages in other chats
+          const found = notifications.some(
+            (notif) => notif.message._id === newMessageRecieved._id
+          );
+          if (!found) {
+            getNotification();
+          }
         } else {
           setMessages([...messages, newMessageRecieved]);
         }
@@ -130,6 +184,7 @@ const SingleChat = ({ filterLoggedInUser }) => {
         selectedChat={selectedChat}
         setSelectedChat={setSelectedChat}
         filterLoggedInUser={filterLoggedInUser}
+        leaveChat={leaveChat}
       />
       <ChatContainer
         className={`row-start-2 row-end-3 overflow-y-scroll max-h-[70vh]`}

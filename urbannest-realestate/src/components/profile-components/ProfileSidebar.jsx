@@ -1,9 +1,10 @@
-import { LogOut } from "lucide-react";
-import { useContext } from "react";
+import { LogOut, User } from "lucide-react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { ProfileContext } from "../../../context/profileContext";
-import { NavLink } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import Toggle from "../Toggle";
 import { UserContext } from "../../../context/userContext";
+import useClickOutside from "../../hooks/useClickOutside";
 
 const ProfileSidebar = ({
   select,
@@ -11,6 +12,7 @@ const ProfileSidebar = ({
   profileItems,
   handleLogout,
   className,
+  landingPageLinks,
 }) => {
   const { show, setShow } = useContext(ProfileContext);
 
@@ -40,17 +42,19 @@ const ProfileSidebar = ({
           select={select}
           setSelect={setSelect}
           handleLogout={handleLogout}
+          landingPageLinks={landingPageLinks}
         />
       </aside>
     </div>
   );
 };
 
-function Sidebar({ profileItems, select, setSelect, handleLogout }) {
+function Sidebar({ profileItems, handleLogout, landingPageLinks }) {
   const { user } = useContext(UserContext);
   const { show, setShow } = useContext(ProfileContext);
+
   return (
-    <div className=" overflow-y-auto flex w-full h-full justify-between flex-col text-white">
+    <div className=" overflow-y-auto overflow-x-hidden flex w-full h-full justify-between flex-col text-white">
       <div>
         <h1 className="md:flex hidden items-center justify-center font-bold text-xl">
           User Profile
@@ -63,7 +67,7 @@ function Sidebar({ profileItems, select, setSelect, handleLogout }) {
               className={({ isActive }) =>
                 `${isActive ? "text-orange border-r-2 border-orange" : ""} ${
                   show ? "px-7 justify-start" : "justify-center"
-                } w-full flex md:justify-start  py-3 gap-3 md:px-7`
+                } w-full flex md:justify-start  py-3 gap-3 md:px-7 relative`
               }
               key={index}
             >
@@ -74,6 +78,17 @@ function Sidebar({ profileItems, select, setSelect, handleLogout }) {
             </NavLink>
           ))}
         </div>
+      </div>
+      <div className="flex flex-col justify-center items-center">
+        {landingPageLinks.map(({ name, url }, index) => (
+          <NavLink
+            key={index}
+            to={url}
+            className={`${show ? "block" : "hidden"} flex-1`}
+          >
+            {name}
+          </NavLink>
+        ))}
       </div>
       <div className="flex flex-col items-center justify-center gap-3">
         <div className="sm:hidden flex items-center gap-2 ">

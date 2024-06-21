@@ -7,7 +7,7 @@ const Notifications = () => {
   const { user } = useContext(UserContext);
 
   const filterLoggedInUser = (chat) => {
-    const sender = chat?.users?.filter((item) => item._id !== user._id);
+    const sender = chat?.users?.filter((item) => item._id !== user?._id);
     return sender;
   };
 

@@ -8,7 +8,6 @@ const AllChats = ({ filterLoggedInUser }) => {
   // const [sender, setSender] = useState(null);
 
   const {
-    user,
     loading,
     setLoading,
     selectedChat,
@@ -58,6 +57,7 @@ const AllChats = ({ filterLoggedInUser }) => {
               onClick={() => setSelectedChat(chat)}
               image={filterLoggedInUser(chat)[0]?.avatar}
               username={filterLoggedInUser(chat)[0]?.username}
+              chat={chat}
               key={index}
             />
           ))
@@ -73,17 +73,30 @@ const AllChats = ({ filterLoggedInUser }) => {
 
 export default AllChats;
 
-const ChatCard = ({ image, username, onClick, className }) => {
+const ChatCard = ({ image, username, onClick, className, chat }) => {
+  const { notifications } = useContext(UserContext);
+  const [unread, setUnread] = useState(null);
+
+  useEffect(() => {
+    setUnread(notifications?.filter((notif) => notif?.chat?._id === chat._id));
+  }, [notifications]);
+
   return (
     <div
-      className={`flex gap-5 border-b-2 border-b-gray py-3 px-3 rounded cursor-pointer ${className}`}
+      className={`${
+        unread?.length > 0 ? "bg-orange bg-opacity-10 " : ""
+      } flex items-center justify-between border-b-2 border-b-gray py-3 px-3 rounded cursor-pointer ${className}`}
       onClick={onClick}
     >
-      <img src={image} alt="" className="rounded-full w-10 h-10" />
-      <div>
+      <div className="flex items-center gap-5">
+        <img src={image} alt="" className="rounded-full w-10 h-10" />
         <h3 className="font-semibold text-lg">{username}</h3>
-        <p className="text-light-gray text-xs">latest message</p>
       </div>
+      {unread?.length > 0 && (
+        <div className="w-5 h-5 flex justify-center items-center text-xs font-semibold bg-orange bg-opacity-70 rounded-full">
+          {unread?.length}
+        </div>
+      )}
     </div>
   );
 };

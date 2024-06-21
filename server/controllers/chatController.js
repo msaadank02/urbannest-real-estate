@@ -2,39 +2,30 @@ const asynchandler = require('express-async-handler')
 const Chat = require('../models/chatModel');
 const jwt = require("jsonwebtoken");
 const User = require('../models/user');
+const Notification = require('../models/notificationModel');
+const Message = require('../models/messageModel');
+const NotificationModel = require('../models/notificationModel');
 
 const accessChat = asynchandler(async(req, res) => {
     const { userId } = req.body;
-    const { token } = req.cookies;
+    const { _id } = req.user;
 
     console.log(userId)
 
-    if(!token){
-        res.json({error: "Please Login to chat with the seller"})
-    }
     if(!userId){
-        console.log("User id not available")
+        console.log("Invalid seller Id")
         res.sendStatus(400)
     }
 
-    let loggedInUser;
-    jwt.verify(token, process.env.JWT_SECRET, {}, async (err, user) => {
-            if(err) throw err;
-            const data = await User.findOne({_id: user._id}).exec()
-            if(!data) return res.json({error: "No user found"})
-            
-            loggedInUser = data._id
-            loggedInUser = loggedInUser.toString()
-            console.log(loggedInUser)
-            if(loggedInUser === userId){
-                return res.json({error: "You can not contact with yourself :)"})
-            }
-        })
+    const loggedInUser = _id.toString()
+    if(loggedInUser === userId){
+        return res.json({error: "You can not contact with yourself :)"})
+    }
     
     var isChat = await Chat.find({
         $and: [
-        { users: { $elemMatch: { $eq: loggedInUser } } },
-        { users: { $elemMatch: { $eq: userId } } },
+            { users: { $elemMatch: { $eq: loggedInUser } } },
+            { users: { $elemMatch: { $eq: userId } } },
         ],
     })
         .populate("users", "-password")
@@ -45,12 +36,18 @@ const accessChat = asynchandler(async(req, res) => {
         select: "username avatar email",
     });
     if (isChat.length > 0) {
+        isChat[0].lastRead.set(loggedInUser, new Date())
+        const deletedNotification = await NotificationModel.deleteMany({
+            user: loggedInUser,
+            chat: isChat[0]._id
+        })
+        isChat.save()
         res.send(isChat[0]);
     } else {
         var chatData = {
-        chatName: "sender",
-        isGroupChat: false,
-        users: [loggedInUser, userId],
+            chatName: "sender",
+            isGroupChat: false,
+            users: [loggedInUser, userId],
         };
 
         try {
@@ -59,6 +56,12 @@ const accessChat = asynchandler(async(req, res) => {
             });
 
             if (existingChat) {
+                existingChat.lastRead.set(loggedInUser, new Date())
+                const deletedNotification = await NotificationModel.deleteMany({
+                    user: loggedInUser,
+                    chat: existingChat._id
+                })
+                await existingChat.save()
                 return res.json(existingChat);
             }
             const createdChat = await Chat.create(chatData);
@@ -76,14 +79,14 @@ const accessChat = asynchandler(async(req, res) => {
 
 const fetchChats = asynchandler(async(req, res) => {
     try {
-        Chat.find({users: {$elemMatch: {$eq: req.body._id}}})
+        Chat.find({users: {$elemMatch: {$eq: req.user._id}}})
             .populate("users", "-password")
             .populate("latestMessage")
             .sort({updatedAt: -1})
             .then(async (result) => {
                 result = await User.populate(result, {
                     path: "latestMessage",
-                    select: "name avatar email"
+                    select: "username avatar email"
                 })
                 res.status(200).send(result)
             });

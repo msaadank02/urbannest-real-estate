@@ -1,15 +1,17 @@
 import axios from "axios";
 import React, { useEffect, useState, useContext } from "react";
 import toast from "react-hot-toast";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import ImageSlider from "../components/ImageSlider";
-import { Bath, Bed, Phone, Ruler } from "lucide-react";
+import { Bath, Bed, Ruler } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../../context/userContext";
-import { IoIosCall, IoMdCall, IoMdMail } from "react-icons/io";
+import { IoMdCall, IoMdMail } from "react-icons/io";
+import heartIcon from "../assets/icons/heartIcon.svg";
+import outlineHeart from "../assets/icons/outlineHeart.svg";
 
 const Listing = () => {
-  const { setLoading, setSelectedChat, chats, setChats } =
+  const { setLoading, setSelectedChat, chats, setChats, user, setUser } =
     useContext(UserContext);
 
   const [listing, setListing] = useState(null);
@@ -47,6 +49,11 @@ const Listing = () => {
       const { data } = await axios.post(`/access-chat`, {
         userId: listing.userRef,
       });
+      if (data === null) {
+        toast.error("Please Login before contacting the seller");
+        navigate("/login");
+        return;
+      }
       if (data.error) {
         toast.error(data.error);
         setLoading(false);
@@ -64,6 +71,48 @@ const Listing = () => {
     }
   };
 
+  const addToFavorites = async () => {
+    try {
+      const { data } = await axios.post("/add-to-favorites", {
+        listingId: listing._id,
+      });
+
+      if (data === null) {
+        toast.error("Please Login first");
+        navigate("/login");
+        return;
+      }
+
+      if (data.error) {
+        toast.error("Server failed to add the listing to favorites");
+        return;
+      }
+
+      setUser({ ...user, favorites: data });
+      toast.success("Property added to favorites");
+    } catch (error) {
+      toast.error("Error adding to favorites");
+    }
+  };
+
+  const removeFromFavorites = async () => {
+    try {
+      const { data } = await axios.post("/remove-favorite", {
+        listingId: listing._id,
+      });
+      console.log(data);
+      if (data.error) {
+        toast.error("Server failed to remove favorite Property");
+        return;
+      }
+
+      setUser({ ...user, favorites: data });
+      toast.success("Property Removed from favorites");
+    } catch (error) {
+      toast.error("Error removing from favorites");
+    }
+  };
+
   console.log(listing);
 
   return (
@@ -73,7 +122,7 @@ const Listing = () => {
         <div className="max-w-[1200px] w-full h-[500px] my-4 mx-auto rounded-lg overflow-hidden">
           <ImageSlider imageUrls={listing?.images} />
         </div>
-        <div className="lg:w-72 bg-gray px-5 py-8 rounded-lg flex items-center lg:flex-col sm:flex-row flex-col gap-5 w-full">
+        <div className="lg:w-72 bg-gray px-5 py-8 rounded-lg flex items-center lg:flex-col sm:flex-row flex-wrap gap-8 w-full">
           <div>
             <h2 className="text-white text-2xl">
               PKR <span className="font-bold text-3xl">{listing?.price}</span>
@@ -92,6 +141,44 @@ const Listing = () => {
             <p className="flex items-center gap-3 text-white">
               <IoMdMail /> {listingUser?.email}
             </p>
+          </div>
+          <div className="flex items-center gap-2 text-white md:w-full">
+            {!user?.favorites.includes(listing?._id) || !user ? (
+              <img
+                src={outlineHeart}
+                alt="outline-heart-icon"
+                className="w-5 cursor-pointer"
+                onClick={addToFavorites}
+              />
+            ) : (
+              <img
+                src={heartIcon}
+                alt="heart-icon"
+                className="w-5 cursor-pointer"
+                onClick={removeFromFavorites}
+              />
+            )}
+            {!user?.favorites.includes(listing?._id) || !user ? (
+              <div className="flex flex-col gap-0">
+                <p className="leading-5">Add to Favorites </p>
+                <Link
+                  to={"/profile/favourites"}
+                  className="text-xs text-orange leading-3 hover:underline cursor-pointer"
+                >
+                  Browse favorites
+                </Link>
+              </div>
+            ) : (
+              <div>
+                <p>Remove from favorites </p>
+                <Link
+                  to={"/profile/favourites"}
+                  className="text-xs text-orange leading-3 hover:underline cursor-pointer"
+                >
+                  Browse favorites
+                </Link>
+              </div>
+            )}
           </div>
         </div>
       </div>

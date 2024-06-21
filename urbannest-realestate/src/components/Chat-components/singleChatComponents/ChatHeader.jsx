@@ -6,6 +6,7 @@ const ChatHeader = ({
   className,
   selectedChat,
   setSelectedChat,
+  leaveChat,
 }) => {
   return (
     <div
@@ -14,7 +15,10 @@ const ChatHeader = ({
       } ${className} gap-3 items-center w-full px-4 py-2 border-b border-gray-600`}
     >
       <ArrowLeft
-        onClick={() => setSelectedChat(null)}
+        onClick={() => {
+          leaveChat();
+          setSelectedChat(null);
+        }}
         className="cursor-pointer"
         width={22}
       />

@@ -18,7 +18,7 @@ const Dashboard = ({ className }) => {
       className={`${className} grid grid-cols-3 gap-5 w-full text-white p-5 max-h-screen overflow-y-auto`}
     >
       <div className="col-span-1 max-md:col-span-3 flex flex-col justify-center items-center gap-10 bg-gray py-7 px-0 rounded-xl">
-        <h1 className="text-2xl font-semibold">Listings</h1>
+        <h1 className="text-2xl font-semibold">Properties</h1>
         <div className="flex items-center">
           <div className="flex items-center justify-center flex-col gap-3">
             <h1 className="text-2xl">{listings.length}</h1>
@@ -33,7 +33,7 @@ const Dashboard = ({ className }) => {
           Looking to sell or <br /> Rent your property?
         </h1>
         <p className=" text-gray-600 text-lg">
-          Post your listing now on urbannest.pk
+          Post your property now on urbannest.pk
         </p>
         <div>
           <div className="flex gap-2 items-center">
@@ -47,7 +47,7 @@ const Dashboard = ({ className }) => {
         </div>
         <div>
           <button className="bg-orange px-5 py-2 rounded-lg">
-            <NavLink to={"/profile/add-listing"}>Add Listing</NavLink>
+            <NavLink to={"/profile/add-listing"}>Add Property</NavLink>
           </button>
         </div>
         <img
@@ -57,7 +57,7 @@ const Dashboard = ({ className }) => {
         />
       </div>
       <div className="col-span-3 flex flex-col gap-5 rounded-xl w-full bg-gray h-full px-7 py-4">
-        <h1 className="text-2xl font-semibold">My recent Lisitings</h1>
+        <h1 className="text-2xl font-semibold">My recent Properties</h1>
         <div className="flex items-center justify-center w-full">
           {error ? (
             "Error while fetching listings"

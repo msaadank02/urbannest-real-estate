@@ -1,6 +1,6 @@
 import { Link, NavLink } from "react-router-dom";
 import { navLinks } from "../data/data";
-import { User, X, Power } from "lucide-react";
+import { User, X, Power, Bell } from "lucide-react";
 import { UserContext } from "../../context/userContext";
 import { useContext } from "react";
 import Toggle from "./Toggle";
@@ -11,7 +11,7 @@ const Sidebar = ({
   handleLogout,
   requestSelling,
 }) => {
-  const { user } = useContext(UserContext);
+  const { user, notifications } = useContext(UserContext);
 
   return (
     <div>
@@ -23,13 +23,13 @@ const Sidebar = ({
       <div
         className={`${
           showSidebar ? "show-sidebar" : "close-sidebar"
-        } overflow-y-auto bg-darkgray`}
+        } overflow-y-auto bg-darkgray max-[400px]:w-full`}
       >
         <div
           className="text-white absolute top-0 m-5 cursor-pointer hover:text-orange transition-all duration-200"
           onClick={() => setShowSidebar(!showSidebar)}
         >
-          <X width={30} height={30} />
+          <X width={20} height={20} />
         </div>
 
         <div className="flex flex-col justify-between h-full">
@@ -120,13 +120,25 @@ const Sidebar = ({
               />{" "}
               {user?.username}
             </Link>
-            <li
-              onClick={() => {
-                handleLogout();
-                setShowSidebar(!showSidebar);
-              }}
-            >
-              <Power className="text-light-red pointer" />
+            <li className="flex gap-1">
+              <Link
+                to={"/profile/notifications"}
+                onClick={() => setShowSidebar(!showSidebar)}
+                className="relative"
+              >
+                {notifications?.length > 0 && (
+                  <div className="absolute bg-orange w-2 h-2 rounded-full right-0" />
+                )}
+                <Bell width={22} className="pointer" />
+              </Link>
+              <div
+                onClick={() => {
+                  handleLogout();
+                  setShowSidebar(!showSidebar);
+                }}
+              >
+                <Power width={22} className="text-light-red pointer" />
+              </div>
             </li>
           </ul>
         </div>

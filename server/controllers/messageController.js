@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const Message = require('../models/messageModel');
 const UserModel = require('../models/user');
 const Chat = require('../models/chatModel');
+const NotificationModel = require('../models/notificationModel');
 
 const sendMessage = asyncHandler(async (req, res) => {
     const { chatId, content } = req.body
@@ -44,7 +45,26 @@ const sendMessage = asyncHandler(async (req, res) => {
             select: "username avatar email",
         });
 
-        await Chat.findByIdAndUpdate(req.body.chatId, { latestMessage: message });
+        const chat = await Chat.findByIdAndUpdate(req.body.chatId, { latestMessage: message }).populate('users');
+
+        chat.users.forEach(async(user) => {
+            if(user._id.toString() !== senderId.toString() && !chat.activeUsers.includes(user._id)){
+                const lastRead = chat.lastRead.get(user._id.toString)
+                const messageCreatedAt = message.createdAt
+
+                console.log(lastRead);
+                console.log(messageCreatedAt);
+                
+                if(!lastRead ||messageCreatedAt > lastRead){
+                    const notification = new NotificationModel({
+                        user: user._id,
+                        chat: chatId,
+                        message: message._id
+                    })
+                    await notification.save()
+                }
+            }
+        })
 
         res.json(message)
 

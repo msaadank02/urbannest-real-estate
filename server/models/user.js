@@ -37,6 +37,10 @@ const userSchema = new Schema({
     city: {
         type: String,
     },
+    favorites: [{
+        type: Schema.Types.ObjectId,
+        ref: "Listing"
+    }],
 });
 
 const UserModel = mongoose.model('User', userSchema);

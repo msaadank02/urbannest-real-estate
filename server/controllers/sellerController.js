@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken')
 
 const requestForSeller = async (req, res) => {
 
-    const data = req.body
+    const data = req.user
     try {
             const role = await RoleModel.findOne({_id: data.roles._id}).exec()
             await RoleModel.updateMany({_id: role._id}, { $set: { name: 'seller', permissions: ['read', 'create', 'update', 'delete'] } })
@@ -92,7 +92,7 @@ const completeProfile = async (req, res) => {
 }
 
 const toggleSelling = async (req, res) => {
-    let user  = req.body
+    let user  = req.user
     
     try {
         const roleId = user.roles._id

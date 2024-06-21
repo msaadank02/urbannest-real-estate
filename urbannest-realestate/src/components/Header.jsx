@@ -2,7 +2,7 @@ import { NavLink, Link, useLocation } from "react-router-dom";
 import logo from "../assets/Images/urbannestNavbar.png";
 import logoIcon from "../assets/Images/urbannestIcon.png";
 import { navLinks } from "../data/data";
-import { ChevronDown, MenuIcon } from "lucide-react";
+import { Bell, ChevronDown, LogOut, MenuIcon, User } from "lucide-react";
 import { useState, useContext, useEffect } from "react";
 import Sidenavbar from "./Sidenavbar";
 import axios from "axios";
@@ -12,6 +12,7 @@ import { ProfileContext } from "../../context/profileContext";
 import { useNavigate } from "react-router-dom";
 import Toggle from "./Toggle";
 import * as React from "react";
+import useClickOutside from "../hooks/useClickOutside";
 
 const Header = ({ handleLogout }) => {
   const [showSidebar, setShowSidebar] = useState(false);
@@ -19,7 +20,7 @@ const Header = ({ handleLogout }) => {
   const [openMenu, setOpenMenu] = useState(false);
   const refMenu = React.useRef();
 
-  const { user } = useContext(UserContext);
+  const { user, notifications } = useContext(UserContext);
 
   const { setRequestSellerSession } = useContext(ProfileContext);
 
@@ -53,29 +54,9 @@ const Header = ({ handleLogout }) => {
     }
   };
 
-  useEffect(() => {
-    let handler = (e) => {
-      if (!refMenu.current.contains(e.target)) {
-        setOpenMenu(false);
-      }
-    };
-    document.addEventListener("mousedown", handler);
-
-    return () => {
-      document.removeEventListener("mousedown", handler);
-    };
-  });
+  useClickOutside(refMenu, () => setOpenMenu(false));
 
   const location = useLocation();
-
-  const [anchorEl, setAnchorEl] = useState(null);
-  const open = anchorEl;
-  const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
 
   // Check if the current path is '/profile'
   if (location.pathname !== "/profile") {
@@ -157,16 +138,19 @@ const Header = ({ handleLogout }) => {
             <Toggle />
           </div>
           <div className="flex items-center gap-2">
-            <Link to={"/profile"}>
+            <Link to={"/profile"} className="relative">
               <img
                 src={user?.avatar}
                 className=" w-10 h-10 object-cover rounded-full"
               />
+              {notifications?.length > 0 && (
+                <div className="w-[0.6rem] h-[0.6rem] rounded-full bg-orange absolute top-0 right-0" />
+              )}
             </Link>
             <div className="relative" ref={refMenu}>
               <ChevronDown
                 onClick={() => setOpenMenu(!openMenu)}
-                className="text-white cursor-pointer"
+                className={`text-white cursor-pointer w-5`}
               />
               <div
                 className={`${
@@ -192,26 +176,36 @@ const Header = ({ handleLogout }) => {
                 </div>
                 <Link
                   to={"/admin-dashboard"}
-                  className={`${
-                    user?.roles?.name === "admin"
-                      ? "px-4 py-2 border border-b-[1px] border-b-light-gray"
-                      : "hidden"
-                  }`}
+                  className={`${user?.roles?.name === "admin" ? "" : "hidden"}`}
                 >
-                  <div onClick={handleClose}>Admin Pannel</div>
+                  <p className="px-4 py-2  border-b-[1px] border-b-light-gray">
+                    Admin Pannel
+                  </p>
                 </Link>
                 <Link to={"/profile"}>
-                  <div
-                    className=" px-4 py-2 border-b-[1px] border-b-light-gray"
-                    onClick={handleClose}
-                  >
+                  <div className=" px-4 py-2 border-b-[1px] border-b-light-gray flex items-center gap-2">
+                    <User width={18} />
                     Profile
+                  </div>
+                </Link>
+                <Link to={"/profile/notifications"}>
+                  <div className="px-4 py-2 border-b-[1px] border-b-light-gray flex items-center gap-2">
+                    <div className="relative">
+                      <Bell width={18} />
+                      {notifications?.length > 0 && (
+                        <div className="w-[0.9rem] h-[0.9rem] flex items-center justify-center rounded-full bg-orange absolute -top-1 -right-2 text-xs">
+                          {notifications?.length}
+                        </div>
+                      )}
+                    </div>
+                    Notifications
                   </div>
                 </Link>
                 <div
                   onClick={handleLogout}
-                  className="cursor-pointer px-4 py-2 "
+                  className="cursor-pointer px-4 py-2 flex items-center gap-2"
                 >
+                  <LogOut width={18} />
                   Logout
                 </div>
               </div>

@@ -12,7 +12,7 @@ router.use(
     })
 )
 
-router.post('/access-chat', accessChat)
+router.post('/access-chat', authMiddleware, accessChat)
 router.get('/fetch-chats', authMiddleware, fetchChats)
 
 module.exports = router

@@ -7,6 +7,8 @@ const { hashPassword, comparePasswords } = require('../helpers/auth')
 const otpGenerator = require('otp-generator')
 const { sendMail } = require('./mailer')
 const Otp = require('../models/otp')
+const Chat = require('../models/chatModel')
+const Message = require('../models/messageModel')
 
 const test = (req, res) => {
     res.json('test is working')
@@ -131,7 +133,7 @@ const loginUser = async (req, res) => {
 }
 
 const getProfile = async (req, res) => {
-    const user = req.body
+    const user = req.user
     try {
         if(user){
             res.json(user)
@@ -288,7 +290,7 @@ const googleAuth = async (req, res) => {
 }
 
 const getAllUsers = async(req, res) => {
-    const user = req.body;
+    const user = req.user;
     
     if(!user){
         return res.status(404).json({error: "No user found"})
@@ -309,13 +311,17 @@ const getAllUsers = async(req, res) => {
 }
 
 const deleteUsers = async(req, res) => {
-    const { roles } = req.body;
-    if(roles.name !== 'admin' || !req.body){
+    const { roles } = req.user;
+    if(roles.name !== 'admin' || !req.user){
         res.status(400).json({error: "Only admin can delete users"})
     }
     const id = req.params.id;
     try {
         const listings = await Listing.deleteMany({userRef: id})
+        const chats = await Chat.find({ users: id });
+        const chatIds = chats.map(chat => chat._id);
+        const messages = await Message.deleteMany({chat: {$in: chatIds}})
+        const deletedChats = await Chat.deleteMany({ _id: { $in: chatIds } });
         const user = await User.findByIdAndDelete({_id: id})
         res.status(200).json({success: "User successfully deleted"})
     } catch (error) {

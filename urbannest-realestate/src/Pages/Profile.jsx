@@ -20,12 +20,12 @@ const profileItems = [
     url: "/profile/dashboard",
   },
   {
-    name: "Add Listing",
+    name: "Add Property",
     icon: <MapPin width={17} />,
     url: "/profile/add-listing",
   },
   {
-    name: "All Listings",
+    name: "All Properties",
     icon: <Home width={17} />,
     url: "/profile/manage-listings",
   },
@@ -38,6 +38,21 @@ const profileItems = [
     name: "Notifications",
     icon: <Bell width={17} />,
     url: "/profile/notifications",
+  },
+];
+
+const landingPageLinks = [
+  {
+    name: "Home",
+    url: "/",
+  },
+  {
+    name: "About",
+    url: "/about",
+  },
+  {
+    name: "Contact",
+    url: "/contact",
   },
 ];
 
@@ -97,6 +112,7 @@ const Profile = () => {
         setSelect={setSelect}
         profileItems={profileItems}
         handleLogout={handleLogout}
+        landingPageLinks={landingPageLinks}
         className={``}
       />
       <Outlet requestSelling={requestSelling} className={``} />

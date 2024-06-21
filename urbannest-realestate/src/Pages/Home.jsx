@@ -13,6 +13,7 @@ import { motion, useInView, useAnimation } from "framer-motion";
 import useFetch from "../useFetch";
 import ListingCard from "../components/ListingCard";
 import Loader from "../components/Loader";
+import SkeletonCard from "../components/SkeletonCard";
 
 const Home = () => {
   return (
@@ -99,7 +100,7 @@ const ExploreBtn = () => {
         initial="hidden"
         animate="visible"
         transition={{ delay: 0.3 }}
-        class="w-40 px-5 py-2 bg-white rounded-lg overflow-hidden relative group z-0 cursor-pointer"
+        className="w-40 px-5 py-2 bg-white rounded-lg overflow-hidden relative group z-0 cursor-pointer"
       >
         <div class="circle absolute h-[5em] w-[5em] -top-[2.5em] -right-[2.5em] rounded-full bg-orange group-hover:scale-[800%] duration-500 z-[-1] op"></div>
         <div className="flex items-center justify-between">
@@ -171,7 +172,7 @@ const Features = () => {
           />
           <div className="flex flex-col gap-10">
             <div className="flex justify-between items-center px-6">
-              <h1 className="text-white font-semibold text-5xl">
+              <h1 className="text-white font-semibold sm:text-5xl text-3xl">
                 Why Chose Us?
               </h1>
               <Link to={token ? "/profile/dashboard" : "register"}>
@@ -201,10 +202,11 @@ const Features = () => {
               transition={{ delay: 0.4, duration: 0.4 }}
               initial="hidden"
               animate={animateControls}
-              className="border-white border-opacity-25 w-full grid gap-5 grid-cols-[repeat(auto-fill,minmax(300px,1fr))]"
+              className="border-white border-opacity-25 w-full grid gap-5 grid-cols-[repeat(auto-fill,minmax(300px,1fr))] max-[400px]:grid-cols-[repeat(auto-fill,minmax(200px,1fr))]"
             >
               {features.map((feature) => (
                 <FeatureCards
+                  key={feature.id}
                   heading={feature.heading}
                   description={feature.description}
                   url={feature.url}
@@ -230,6 +232,7 @@ const RecentListings = ({ purpose }) => {
       <h2 className="font-semibold text-xl">
         Recent {purpose === "sell" ? "Selling" : "Rental"} Properties
       </h2>
+      {loading && <SkeletonCard number={4} />}
       <div
         className={`${
           loading ? "flex items-center justify-center" : "grid"
@@ -238,21 +241,16 @@ const RecentListings = ({ purpose }) => {
         {!loading && data?.length === 0 && (
           <p className="text-white text-xl">No listings found</p>
         )}
-        {loading && (
-          <div className="flex items-center justify-center w-full gap-2 mt-4">
-            <Loader width={"w-[30px]"} />
-            <p className="text-white">Fetching Properties</p>
-          </div>
-        )}
         {!loading &&
           data?.length > 0 &&
           data.map((listing, i) => (
             <motion.div
+              key={listing._id}
               initial={{ opacity: 0, x: -30 }}
               whileInView={{ opacity: 1, x: 0, transition: { delay: i * 0.2 } }}
               viewport={{ once: true }}
             >
-              <ListingCard key={listing._id} listing={listing} />
+              <ListingCard listing={listing} />
             </motion.div>
           ))}
       </div>
@@ -283,7 +281,7 @@ const Hero2 = () => {
               x: 0,
               transition: { duration: 1, delay: 0.5 },
             }}
-            // viewport={{ once: true }}
+            viewport={{ once: true }}
             className="sm:w-[30rem] sm:h-[35rem] w-[20rem] h-[25rem] overflow-hidden rounded-t-[15rem] "
           >
             <img
@@ -307,6 +305,7 @@ const Hero2 = () => {
                       delay: i / 6,
                     },
                   }}
+                  viewport={{ once: true }}
                   key={i}
                 >
                   {el}{" "}
@@ -323,6 +322,7 @@ const Hero2 = () => {
                     delay: 1,
                   },
                 }}
+                viewport={{ once: true }}
                 className="text-orange"
               >
                 Real-estate
@@ -338,6 +338,7 @@ const Hero2 = () => {
                     delay: 1.2,
                   },
                 }}
+                viewport={{ once: true }}
               >
                 Services
               </motion.span>
@@ -350,6 +351,7 @@ const Hero2 = () => {
               x: 0,
               transition: { duration: 1, delay: 0.3 },
             }}
+            viewport={{ once: true }}
           >
             <span>
               Welcome to Urbannest! Your gateway to the perfect property.

@@ -4,6 +4,7 @@ const cors = require('cors')
 const cookieParser = require('cookie-parser')
 const {mongoose} = require('mongoose')
 const path = require('path')
+const Chat = require('./models/chatModel')
 
 
 //database connection
@@ -23,6 +24,7 @@ app.use('/', require('./Routes/sellerRoutes'))
 app.use('/', require('./Routes/listingsRoute'))
 app.use('/', require('./Routes/chatRoutes'))
 app.use('/', require('./Routes/messageRoutes'))
+app.use('/', require('./Routes/notificationRoutes'))
 
 // ---------------------- Deployment Code ----------------------
 

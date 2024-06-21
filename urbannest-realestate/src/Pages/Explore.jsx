@@ -7,6 +7,7 @@ import ListingCard from "../components/ListingCard";
 import Loader from "../components/Loader";
 import { checkboxData } from "../data/checkboxInputData";
 import { motion } from "framer-motion";
+import SkeletonCard from "../components/SkeletonCard";
 
 const label = { inputProps: { "aria-label": "Checkbox demo" } };
 
@@ -149,7 +150,7 @@ const Explore = () => {
   };
 
   return (
-    <div className="flex-col flex md:flex-row">
+    <div className="flex-col flex md:flex-row mb-16">
       <form action="" onSubmit={handleSubmit} className="lg:w-[25%] md:w-[30%]">
         <div className="w-full flex items-center justify-center p-5">
           <input
@@ -239,6 +240,11 @@ const Explore = () => {
         </div>
       </form>
       <div className="w-full">
+        {loading && (
+          <div className="px-10">
+            <SkeletonCard number={9} />
+          </div>
+        )}
         <div
           className={`${
             loading ? "flex items-center justify-center" : "grid"
@@ -247,19 +253,13 @@ const Explore = () => {
           {!loading && listings?.length === 0 && (
             <p className="text-white text-xl">No listings found</p>
           )}
-          {loading && (
-            <div className="flex items-center justify-center w-full gap-2 mt-4">
-              <Loader width={"w-[30px]"} />
-              <p className="text-white">Fetching Properties</p>
-            </div>
-          )}
           {!loading &&
             listings?.length > 0 &&
             listings.map((listing) => (
               <ListingCard key={listing._id} listing={listing} />
             ))}
         </div>
-        {showMore && (
+        {!loading && showMore && (
           <button
             onClick={onShowMoreClick}
             className="text-orange text-center w-full hover:underline"

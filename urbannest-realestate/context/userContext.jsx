@@ -1,10 +1,16 @@
 import axios from "axios";
-import { createContext, useState, useEffect } from "react";
+import { createContext, useState, useEffect, useRef } from "react";
 import useFetch from "../src/useFetch";
+import toast from "react-hot-toast";
+import { io } from "socket.io-client";
 
 export const UserContext = createContext({});
 
+const ENDPOINT = "http://localhost:8000";
+
 export function UserContextProvider({ children }) {
+  const socket = useRef(null);
+
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -27,8 +33,77 @@ export function UserContextProvider({ children }) {
     if (!user) {
       fetchUser();
     }
-  }, [user]); // Include user in the dependency array if necessary
-  console.log(user);
+  }, [user]);
+
+  useEffect(() => {
+    const getNotifications = async () => {
+      try {
+        const { data } = await axios.get("/get-notification");
+        setNotifications(data);
+      } catch (error) {
+        console.error("Error getting notifications", error);
+      }
+    };
+
+    if (!socket.current) {
+      socket.current = io(ENDPOINT);
+    }
+
+    if (user) {
+      socket.current.emit("setup", user);
+      socket.current.on("connected");
+    }
+
+    getNotifications();
+
+    if (socket.current) {
+      socket.current.on("message recieved", (newMessageRecieved) => {
+        if (!selectedChat || selectedChat._id !== newMessageRecieved.chat._id) {
+          const found = notifications.some(
+            (notif) => notif.message._id === newMessageRecieved._id
+          );
+          if (!found) {
+            getNotifications();
+          }
+        }
+      });
+    }
+    return () => {
+      if (socket.current) {
+        socket.current.disconnect();
+        socket.current = null;
+      }
+    };
+  }, [user]);
+
+  useEffect(() => {
+    const leaveAllChats = async () => {
+      try {
+        const { data } = await axios.put("/leave-all-chats");
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    leaveAllChats();
+  }, []);
+
+  useEffect(() => {
+    const handleBeforeUnload = async () => {
+      try {
+        await axios.put("/leave-all-chats");
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    if (user) {
+      window.addEventListener("beforeunload", handleBeforeUnload);
+    }
+
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [user]);
 
   return (
     <UserContext.Provider

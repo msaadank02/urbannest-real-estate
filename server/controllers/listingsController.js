@@ -1,5 +1,6 @@
 const ListingModel = require('../models/listings');
 const Listing = require('../models/listings')
+const User = require('../models/user')
 const jwt = require('jsonwebtoken');
 const RoleModel = require('../models/roleModel');
 
@@ -19,7 +20,7 @@ const getListings = async (req, res) => {
     const sort = req.query.sort || 'createdAt';
     const order = req.query.order || 'desc';
 
-    if(req.body._id.toString() === req.params.id){
+    if(req.user._id.toString() === req.params.id){
         try {
             const listings = await Listing.find({userRef: req.params.id}).sort({[sort]: order}).exec()
             return res.status(200).json(listings)
@@ -37,8 +38,8 @@ const deleteListing = async(req, res) => {
     if(!listing){
         return res.status(404).json({error: "Listing not found!"})
     }
-    console.log(req.body.roles.name)
-    if(req.body.roles.name === 'admin' || req.body._id.toString() === listing.userRef.toString()){
+    console.log(req.user.roles.name)
+    if(req.user.roles.name === 'admin' || req.user._id.toString() === listing.userRef.toString()){
         try {
             await Listing.findByIdAndDelete(req.params.id)
             return res.status(200).json({success: 'Listing has been successfully deleted'})
@@ -47,7 +48,7 @@ const deleteListing = async(req, res) => {
             return res.status(400).json({error: "Error deleting the property"})
         }
     }
-    if(req.body._id.toString() !== listing.userRef.toString()){
+    if(req.user._id.toString() !== listing.userRef.toString()){
         return res.status(404).json({error: "Unauthorized user"})
     }
 }
@@ -142,11 +143,62 @@ const getAllListings = async(req, res) => {
     }
 }
 
+const getFavorites = async(req, res) => {
+    const loggedInUser = req.user
+
+    try {
+        const user = await User.findById(loggedInUser._id).populate('favorites')
+        res.status(200).json(user.favorites)
+    } catch (error) {
+        console.error(error)
+        res.status(400).json({error: "Error adding to favorites"})
+    }
+}
+const addToFavorites = async (req, res) => {
+    const loggedInUser = req.user
+    const { listingId } = req.body
+
+    try {
+        const listing = await ListingModel.findById(listingId)
+        if(!listing){
+            res.status(404).json({error: "No such listing exists"})
+        }
+        const user = await User.findByIdAndUpdate(loggedInUser._id,
+                { $addToSet: { favorites: listingId } },
+                { new: true })
+        res.status(200).json(user.favorites)
+    } catch (error) {
+        console.error(error)
+        res.status(400).json({error: "Error adding to favorites"})
+    }
+}
+const removeFromFavorites = async (req, res) => {
+    const loggedInUser = req.user
+    const { listingId } = req.body
+
+    try {
+        const listing = await ListingModel.findById(listingId)
+        if(!listing){
+            res.status(404).json({error: "No such listing exists"})
+        }
+        const user = await User.findByIdAndUpdate(loggedInUser._id,
+                { $pull: { favorites: listingId } },
+                { new: true })
+        res.status(200).json(user.favorites)
+    } catch (error) {
+        console.error(error)
+        res.status(400).json({error: "Error adding to favorites"})
+    }
+}
+
 module.exports = {
     createListing,
     getListings,
     deleteListing,
     updateListing,
     getOneListing,
-    getAllListings
+    getAllListings,
+    getFavorites,
+    addToFavorites,
+    removeFromFavorites
 }

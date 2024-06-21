@@ -1,43 +1,25 @@
 import React, { useContext, useEffect, useRef } from "react";
 import ScrollableFeed from "react-scrollable-feed";
 import { UserContext } from "../../../../context/userContext";
+import {
+  isLastMessage,
+  isSameSender,
+  isSameSenderMargin,
+} from "../ChatLogic/chatLogic";
 
 const ScrollableMessages = ({ messages }) => {
   const { user } = useContext(UserContext);
   const { selectedChat } = useContext(UserContext);
 
-  const isSameSender = (messages, m, i, userId) => {
-    return (
-      i < messages.length - 1 &&
-      (messages[i + 1].sender._id !== m.sender._id ||
-        messages[i + 1].sender._id === undefined) &&
-      messages[i].sender._id !== userId
-    );
+  const messageContainerRef = useRef(null);
+
+  const scrollToBottom = () => {
+    messageContainerRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  const isLastMessage = (messages, i, userId) => {
-    return (
-      i === messages.length - 1 &&
-      messages[messages.length - 1].sender._id !== userId &&
-      messages[messages.length - 1].sender._id
-    );
-  };
-
-  const isSameSenderMargin = (messages, m, i, userId) => {
-    if (
-      i < messages.length - 1 &&
-      messages[i + 1].sender._id === m.sender._id &&
-      messages[i].sender._id !== userId
-    )
-      return 33;
-    else if (
-      (i < messages.length - 1 &&
-        messages[i + 1].sender._id !== m.sender._id &&
-        messages[i].sender._id !== userId) ||
-      (i === messages.length - 1 && messages[i].sender._id !== userId)
-    )
-      return 0;
-  };
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
   const filterOtherUser = (chat) => {
     const sender = chat?.users?.filter((item) => item._id === user._id);
@@ -76,12 +58,16 @@ const ScrollableMessages = ({ messages }) => {
                 } max-w-[75%] `}
                 style={{
                   marginLeft: isSameSenderMargin(messages, m, i, user?._id),
+                  wordWrap: "break-word", // Ensure words break inside the element
+                  overflowWrap: "break-word", // Break words to prevent overflow
+                  whiteSpace: "pre-wrap", // Handle whitespace correctly and wrap long words
                 }}
               >
                 {m?.content}
               </p>
             </div>
           ))}
+        <div ref={messageContainerRef} />
       </div>
     );
 };
