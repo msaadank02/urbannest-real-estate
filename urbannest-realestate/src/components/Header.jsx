@@ -118,7 +118,7 @@ const Header = ({ handleLogout }) => {
           <button
             onClick={requestSelling}
             className={`${
-              user && user?.roles?.name === "buyer" && !user?.seller
+              user && user?.roles?.[0]?.name === "buyer" && !user?.seller
                 ? "block"
                 : "hidden"
             } bg-orange rounded-lg px-3 py-2 font-bold`}
@@ -133,7 +133,7 @@ const Header = ({ handleLogout }) => {
             <p className="text-sm">
               <span>Switch to</span>
               <br className="w-0 h-0 p-0 m0" />
-              {`${user?.roles?.name == "seller" ? "Buying" : "Selling"}`}
+              {`${user?.roles?.[0]?.name == "seller" ? "Buying" : "Selling"}`}
             </p>
             <Toggle />
           </div>
@@ -176,7 +176,9 @@ const Header = ({ handleLogout }) => {
                 </div>
                 <Link
                   to={"/admin-dashboard"}
-                  className={`${user?.roles?.name === "admin" ? "" : "hidden"}`}
+                  className={`${
+                    user?.roles?.[0]?.name === "admin" ? "" : "hidden"
+                  }`}
                 >
                   <p className="px-4 py-2  border-b-[1px] border-b-light-gray">
                     Admin Pannel

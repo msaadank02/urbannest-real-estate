@@ -1,6 +1,6 @@
 import { useContext, useState, useEffect, useRef } from "react";
 import { UserContext } from "../../../context/userContext";
-import { Pencil, Turtle } from "lucide-react";
+import { Pencil } from "lucide-react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { ProfileContext } from "../../../context/profileContext";
@@ -43,11 +43,13 @@ const UserInfo = ({ className }) => {
     phone: "",
     city: "",
   });
+
   useEffect(() => {
     if (file) {
       handleFileUpload(file);
     }
   }, [file]);
+
   const handleFileUpload = async (file) => {
     const storage = getStorage(app);
     const fileName = new Date().getTime() + file.name;
@@ -175,6 +177,8 @@ const UserInfo = ({ className }) => {
     console.log(`Updating ${event.target.name} to: ${value}`);
     setProfileData({ ...profileData, [event.target.name]: value });
   };
+
+  console.log(filePercentage);
 
   return (
     <div

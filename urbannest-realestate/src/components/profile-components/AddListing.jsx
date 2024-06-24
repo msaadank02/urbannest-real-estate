@@ -149,7 +149,7 @@ const AddListing = () => {
     }
   };
 
-  if (user?.roles?.name === "buyer" && user?.seller) {
+  if (user?.roles?.[0]?.name === "buyer" && user?.seller) {
     return (
       <div className="flex items-center justify-center w-full text-white gap-5">
         <h1 className="font-medium text-xl">
@@ -159,7 +159,7 @@ const AddListing = () => {
       </div>
     );
   }
-  if (user?.roles?.name === "buyer" && !user?.seller) {
+  if (user?.roles?.[0]?.name === "buyer" && !user?.seller) {
     return (
       <div className="flex items-center justify-center w-full text-white">
         <h1 className="font-medium text-xl">

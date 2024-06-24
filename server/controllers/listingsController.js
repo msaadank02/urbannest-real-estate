@@ -38,8 +38,8 @@ const deleteListing = async(req, res) => {
     if(!listing){
         return res.status(404).json({error: "Listing not found!"})
     }
-    console.log(req.user.roles.name)
-    if(req.user.roles.name === 'admin' || req.user._id.toString() === listing.userRef.toString()){
+    console.log(req.user.roles[0].name)
+    if(req.user.roles[0].name === 'admin' || req.user._id.toString() === listing.userRef.toString()){
         try {
             await Listing.findByIdAndDelete(req.params.id)
             return res.status(200).json({success: 'Listing has been successfully deleted'})
@@ -57,7 +57,7 @@ const updateListing = async (req, res) => {
     const { token } = req.cookies
     try {
         jwt.verify(token, process.env.JWT_SECRET, {}, async (err, user) => {
-            if(err) throw err;
+            if(err) res.status(400).json({error: 'User not found'});
 
             const listing = await Listing.findById(req.params.id);
             if (!listing) {
@@ -100,9 +100,22 @@ const getOneListing = async(req, res) => {
 }
 
 const getAllListings = async(req, res) => {
+    const {token} = req.cookies
     try {
 
         let limit = parseInt(req.query.limit) || 9;
+        var loggedUser = null
+        if(token){
+            jwt.verify(token, process.env.JWT_SECRET, {}, async(err, user) => {
+                if(err) res.status(400).json({error: 'User not found / Invalid token'})
+                loggedUser = user
+            })
+        }
+        if(loggedUser?.roles?.[0]?.name === 'admin'){
+            const listings = await ListingModel.find()
+            limit = listings.length
+        }
+
 
         const startIndex = parseInt(req.query.startIndex) || 0;
 

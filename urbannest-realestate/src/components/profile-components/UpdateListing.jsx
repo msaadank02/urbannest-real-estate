@@ -184,7 +184,7 @@ const UpdateListing = () => {
   return (
     <form
       onSubmit={updateListing}
-      className="flex flex-col gap-7 items-center w-full py-10"
+      className="flex flex-col gap-7 items-center w-full py-10 overflow-scroll"
     >
       <h1 className="text-white font-bold text-3xl">Update Listing</h1>
 

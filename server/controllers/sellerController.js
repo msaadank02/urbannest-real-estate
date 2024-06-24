@@ -53,8 +53,6 @@ const completeProfile = async (req, res) => {
         const findUsername = await User.findOne({username: username}).exec()
 
         if(findUsername && findUsername._id.toString() !== user._id.toString()){
-            console.log(findUsername._id)
-            console.log(user._id)
             return res.json({error: "Username already exists"})
         }
 
@@ -66,11 +64,7 @@ const completeProfile = async (req, res) => {
             city: city,
         }}).exec()
 
-        console.log(updatedUser.username);
-
-
         if(requestSellerSession){
-            console.log(requestSellerSession)
             await RoleModel.findOneAndUpdate(
                 { _id: updatedUser.roles[0] },
                 {
@@ -95,7 +89,7 @@ const toggleSelling = async (req, res) => {
     let user  = req.user
     
     try {
-        const roleId = user.roles._id
+        const roleId = user.roles[0]._id
         const role = await RoleModel.findOne({ _id: roleId }).exec()
 
         if(role.name === 'buyer'){

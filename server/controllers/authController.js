@@ -92,7 +92,7 @@ const loginUser = async (req, res) => {
         }
 
         //check if email exists
-        const user = await User.findOne({email: email})
+        const user = await User.findOne({email: email}).populate('roles')
         
         if(!user){
             return res.json({
@@ -100,24 +100,21 @@ const loginUser = async (req, res) => {
             })
         }
 
-        const roles = await RoleModel.findOne({_id: user.roles[0]}).exec()
-
         //Sending cookie using jwt and Check for password match
         const match = await comparePasswords(password, user.password)
-        console.log(roles);
         if(match){
             jwt.sign({
                 email: user.email,
                 _id: user._id,
                 username: user.username,
                 avatar: user.avatar,
-                roles: roles,
+                roles: user.roles,
                 seller: user.seller,
             }, process.env.JWT_SECRET, {}, (err, token) => {
                 if(err) throw err;
                 res.cookie('token', token, { httpOnly: false }).json({
                     ...user._doc,
-                    roles: roles,
+                    roles: user.roles,
                 })
             })
         }
@@ -298,12 +295,12 @@ const getAllUsers = async(req, res) => {
 
     const searchTerm = req.query.searchTerm || '';
 
-    if(user.roles.name !== 'admin'){
+    if(user.roles[0].name !== 'admin'){
         return res.status(404).json({error: "Access denied, only admins can get all users"});
     }
     try {
         const users = await User.find({username: {$regex: searchTerm, $options: 'i'}}, {password: 0})
-        const filteredUsers = users.filter(user => user.roles.name !== 'admin');
+        const filteredUsers = users.filter(user => user.roles[0].name !== 'admin');
         return res.status(200).json(filteredUsers)
     } catch (error) {
         return res.json({error: "Error fetching the users"})

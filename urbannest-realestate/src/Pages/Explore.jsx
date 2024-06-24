@@ -8,6 +8,8 @@ import Loader from "../components/Loader";
 import { checkboxData } from "../data/checkboxInputData";
 import { motion } from "framer-motion";
 import SkeletonCard from "../components/SkeletonCard";
+import CheckboxInput from "../components/CheckboxInput";
+import CheckboxTypeFilters from "../components/CheckboxTypeFilters";
 
 const label = { inputProps: { "aria-label": "Checkbox demo" } };
 
@@ -273,71 +275,3 @@ const Explore = () => {
 };
 
 export default Explore;
-
-const CheckboxInput = ({
-  id,
-  name,
-  sidebarData,
-  handleChange,
-  value,
-  purpose,
-  htmlFor,
-}) => {
-  return (
-    <div className="flex items-center gap-2">
-      <input
-        type="checkbox"
-        id={id}
-        name={name}
-        checked={sidebarData.purpose === purpose}
-        onChange={handleChange}
-        className="peer relative appearance-none w-5 h-5 border border-orange rounded-md cursor-pointer focus:outline-none checked:bg-orange hover:ring-1 hover:ring-orange after:contemt-[''] after:w-full after:h-full after:top-0 after:left-0"
-      />
-      <label htmlFor={htmlFor} className="text-white text-lg cursor-pointer">
-        {value}
-      </label>
-    </div>
-  );
-};
-
-const CheckboxTypeFilters = ({ item, parent, onChange, typeArray }) => {
-  if (item.parent) {
-    return (
-      <div className="text-neutral-600">
-        <h3 className="text-lg font-semibold">
-          {item.name[0].toUpperCase()}
-          {item?.name.slice(1)}
-        </h3>
-        <div className="flex w-full flex-wrap gap-2">
-          {item.items.map((child) => (
-            <CheckboxTypeFilters
-              item={child}
-              parent={parent}
-              onChange={onChange}
-              typeArray={typeArray}
-            />
-          ))}
-        </div>
-      </div>
-    );
-  } else {
-    const checked = typeArray.some(
-      (obj) => obj[`type.${parent}`] === item.name
-    );
-    return (
-      <div className="flex items-center gap-1">
-        <input
-          type="checkbox"
-          id={item.id}
-          name={item.name}
-          checked={checked}
-          onChange={(e) => onChange(e, parent)}
-          className="peer relative appearance-none w-4 h-4 border border-orange rounded cursor-pointer focus:outline-none checked:bg-orange hover:ring-1 hover:ring-orange after:contemt-[''] after:w-full after:h-full after:top-0 after:left-0"
-        />
-        <label htmlFor={item.id} className="text-white cursor-pointer text-sm">
-          {item.name}
-        </label>
-      </div>
-    );
-  }
-};

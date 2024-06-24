@@ -57,7 +57,7 @@ const ProfileHeader = ({ requestSelling, handleLogout, className }) => {
           <button
             onClick={requestSelling}
             className={`${
-              user && user?.roles?.name === "buyer" && !user.seller
+              user && user?.roles?.[0]?.name === "buyer" && !user.seller
                 ? "block"
                 : "hidden"
             } text-white bg-orange rounded-lg px-3 py-2 font-bold`}
@@ -70,7 +70,7 @@ const ProfileHeader = ({ requestSelling, handleLogout, className }) => {
             } text-white max-sm:hidden`}
           >
             <p className="text-sm">{`Switch to ${
-              user?.roles?.name == "seller" ? "Buying" : "Selling"
+              user?.roles?.[0]?.name == "seller" ? "Buying" : "Selling"
             }`}</p>
             <Toggle />
           </div>
@@ -132,7 +132,7 @@ const ProfileHeader = ({ requestSelling, handleLogout, className }) => {
             <Link
               to={"/admin-dashboard"}
               className={`${
-                user?.roles?.name === "admin" ? "flex" : "hidden"
+                user?.roles?.[0]?.name === "admin" ? "flex" : "hidden"
               } items-center justify-center gap-2`}
             >
               <Shield className="w-4" />

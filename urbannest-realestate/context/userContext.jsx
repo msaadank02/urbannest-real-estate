@@ -105,6 +105,8 @@ export function UserContextProvider({ children }) {
     };
   }, [user]);
 
+  console.log(user?.roles);
+
   return (
     <UserContext.Provider
       value={{

@@ -7,7 +7,7 @@ import ListingCard from "../ListingCard";
 import Loader from "../Loader";
 import toast from "react-hot-toast";
 
-const ManageListings = ({ className }) => {
+const Favorites = ({ className }) => {
   const { user, loading, setLoading } = useContext(UserContext);
   const [favorites, setFavorites] = useState([]);
 
@@ -30,7 +30,7 @@ const ManageListings = ({ className }) => {
       }
     };
     fetchFavorites();
-  }, []);
+  }, [user]);
 
   return (
     <div
@@ -66,4 +66,4 @@ const ManageListings = ({ className }) => {
   );
 };
 
-export default ManageListings;
+export default Favorites;

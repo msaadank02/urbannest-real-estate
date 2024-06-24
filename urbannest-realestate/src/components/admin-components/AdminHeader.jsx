@@ -1,14 +1,18 @@
 import logo from "../../assets/Images/urbannestNavbar.png";
 import logoIcon from "../../assets/Images/urbannestIcon.png";
-import avatar from "../../assets/Images/monster.png";
 import { ChevronDown, LogOut, Power } from "lucide-react";
 import { Link, useSearchParams } from "react-router-dom";
-import { useContext, useState } from "react";
+import { useContext, useRef, useState } from "react";
 import { UserContext } from "../../../context/userContext";
+import useClickOutside from "../../hooks/useClickOutside";
 
 const AdminHeader = ({ handleLogout, className }) => {
   const { user } = useContext(UserContext);
   const [dropDown, setDropDown] = useState(false);
+
+  const dropMenu = useRef(null);
+
+  useClickOutside(dropMenu, () => setDropDown(false));
 
   const stringShortner = (str) => {
     const string = str?.slice(0, 6);
@@ -43,20 +47,22 @@ const AdminHeader = ({ handleLogout, className }) => {
             />
           </Link>
           <p className="text-white">{stringShortner(user?.username)}..</p>
-          <ChevronDown
-            className={`${
-              dropDown ? "" : "rotate-180"
-            } text-white w-5 cursor-pointer transition-all duration-150`}
-            onClick={() => setDropDown(!dropDown)}
-          />
-          <div
-            onClick={handleLogout}
-            className={`${
-              dropDown ? "absolute scale-100" : "absolute scale-0"
-            } transition-all duration-150 flex gap-2 bg-white px-5 py-2 right-0 top-10 rounded-lg cursor-pointer`}
-          >
-            <Power className="text-red w-4" />
-            <p className="text-red">Logout</p>
+          <div ref={dropMenu}>
+            <ChevronDown
+              className={`${
+                dropDown ? "" : "rotate-180"
+              } text-white w-5 cursor-pointer transition-all duration-150`}
+              onClick={() => setDropDown(!dropDown)}
+            />
+            <div
+              onClick={handleLogout}
+              className={`${
+                dropDown ? "absolute scale-100" : "absolute scale-0"
+              } transition-all duration-150 flex gap-2 bg-white px-5 py-2 right-0 top-10 rounded-lg cursor-pointer`}
+            >
+              <Power className="text-red w-4" />
+              <p className="text-red">Logout</p>
+            </div>
           </div>
         </div>
       </div>

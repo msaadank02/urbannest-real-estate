@@ -22,7 +22,7 @@ const ScrollableMessages = ({ messages }) => {
   }, [messages]);
 
   const filterOtherUser = (chat) => {
-    const sender = chat?.users?.filter((item) => item._id === user._id);
+    const sender = chat?.users?.filter((item) => item._id === user?._id);
     return sender;
   };
 

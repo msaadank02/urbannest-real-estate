@@ -7,7 +7,7 @@ const Toggle = () => {
   const { user, setUser } = useContext(UserContext);
 
   useEffect(() => {
-    if (user?.roles?.name === "seller") {
+    if (user?.roles?.[0]?.name === "seller") {
       setToggle(true);
     } else {
       setToggle(false);

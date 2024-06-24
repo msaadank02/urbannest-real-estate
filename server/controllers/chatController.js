@@ -41,7 +41,6 @@ const accessChat = asynchandler(async(req, res) => {
             user: loggedInUser,
             chat: isChat[0]._id
         })
-        isChat.save()
         res.send(isChat[0]);
     } else {
         var chatData = {

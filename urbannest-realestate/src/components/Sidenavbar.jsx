@@ -103,7 +103,7 @@ const Sidebar = ({
           >
             <Link to={"/profile"} className="flex gap-3 items-center">
               <p>{`Switch to ${
-                user?.roles?.name === "buyer" ? "Buying" : "Selling"
+                user?.roles?.[0]?.name === "buyer" ? "Buying" : "Selling"
               }`}</p>
               <Toggle />
             </Link>
