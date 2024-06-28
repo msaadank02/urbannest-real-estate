@@ -106,7 +106,9 @@ const ListingCard = ({ listing, className }) => {
             </div>
             <h6>{listing?.type?.home}</h6>
           </div>
-          <h2 className="font-semibold text-xl truncate">{listing.title}</h2>
+          <h2 className="font-semibold text-xl truncate text-white">
+            {listing.title}
+          </h2>
           <div>
             <span className="text-neutral-600">PKR</span> {listing.price}
           </div>

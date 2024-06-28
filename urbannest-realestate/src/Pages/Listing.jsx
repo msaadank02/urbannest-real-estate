@@ -198,35 +198,35 @@ const Listing = () => {
           </span>
         </div>
       </div>
-      <div className="mt-10">
-        <h2 className="text-white font-bold text-xl">Overview</h2>
-        <div className="px-4 py-2 grid gap-2">
+      <div className="mt-10 ">
+        <h2 className="text-white font-bold text-xl w-full">Overview</h2>
+        <div className="px-4 py-2 grid gap-2 w-11/12">
           <h3 className="text-white text-lg font-semibold">Details</h3>
           <div className="grid grid-cols-2 text-white bg-gray rounded-lg overflow-hidden max-w-xl">
-            <h4 className="px-2 py-1 font-medium">Type</h4>
-            <p className="px-2 py-1 bg-black">
+            <h4 className="px-3 py-2 font-medium">Type</h4>
+            <p className="px-3 py-2 bg-black">
               {listing?.type?.home ||
                 listing?.type?.plots ||
                 listing?.type?.commercial}
             </p>
-            <h4 className="px-2 py-1 font-medium bg-black">Price</h4>
-            <p className="px-2 py-1">{listing?.price} pkr</p>
-            <h4 className="px-2 py-1 font-medium">Address</h4>
-            <p className="px-2 py-1 bg-black">{listing?.address}</p>
-            <h4 className="px-2 py-1 font-medium bg-[#030303]">Bedrooms</h4>
-            <p className="px-2 py-1">{listing?.bedrooms}</p>
+            <h4 className="px-3 py-2 font-medium bg-black">Price</h4>
+            <p className="px-3 py-2">{listing?.price} pkr</p>
+            <h4 className="px-3 py-2 font-medium">Address</h4>
+            <p className="px-3 py-2 bg-black">{listing?.address}</p>
+            <h4 className="px-3 py-2 font-medium bg-[#030303]">Bedrooms</h4>
+            <p className="px-3 py-2">{listing?.bedrooms}</p>
 
-            <h4 className="px-2 py-1 font-medium">Area</h4>
-            <p className="px-2 py-1 bg-black">
+            <h4 className="px-3 py-2 font-medium">Area</h4>
+            <p className="px-3 py-2 bg-black">
               {listing?.areaSize} {listing?.areaUnit}
             </p>
-            <h4 className="px-2 py-1 font-medium bg-black">Purpose</h4>
-            <p className="px-2 py-1">{listing?.purpose}</p>
-            <h4 className="px-2 py-1 font-medium">Bath</h4>
-            <p className="px-2 py-1 bg-black">{listing?.bathrooms}</p>
+            <h4 className="px-3 py-2 font-medium bg-black">Purpose</h4>
+            <p className="px-3 py-2">{listing?.purpose}</p>
+            <h4 className="px-3 py-2 font-medium">Bath</h4>
+            <p className="px-3 py-2 bg-black">{listing?.bathrooms}</p>
           </div>
         </div>
-        <div className="text-white pt-5">
+        <div className="text-white pt-5 w-full">
           <h2 className="font-bold text-xl">Description</h2>
           <p className="px-4">{listing?.description}</p>
         </div>

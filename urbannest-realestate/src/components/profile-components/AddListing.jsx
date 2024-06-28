@@ -738,7 +738,7 @@ function UploadImages({
                     disabled={imageLoading}
                     className="bg-orange px-4 py-2 rounded-md font-semibold"
                   >
-                    {imageLoading ? "Uploading..." : "Upload Images"}
+                    {imageLoading ? "Uploading..." : "Upload Picture"}
                   </button>
                 </div>
                 <p className="text-sm">Max size 3MB, .jpg .png only</p>

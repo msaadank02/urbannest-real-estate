@@ -24,24 +24,38 @@ export const ProfileProtectedRoute = ({ children }) => {
 };
 
 export const AdminProtectedRoute = ({ children }) => {
+  const token = getToken();
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     const fetchUser = async () => {
       try {
         const { data } = await axios.get("/profile");
-        console.log(data);
         if (data) {
           setUser(data);
         }
       } catch (error) {
         console.error("Error fetching user profile:", error);
+      } finally {
+        setLoading(false);
       }
     };
-    // Fetch user only when data changes
-    fetchUser();
-  }, []);
-  if (!user && user?.roles?.name !== "admin") {
-    return <Navigate to={"/"} replace={true}></Navigate>;
+
+    if (token) {
+      fetchUser();
+    } else {
+      setLoading(false);
+    }
+  }, [token]);
+
+  if (loading) {
+    return <div>Loading...</div>;
   }
+
+  if (!user || user?.roles?.[0]?.name !== "admin") {
+    return <Navigate to={"/login"} replace={true} />;
+  }
+
   return children;
 };

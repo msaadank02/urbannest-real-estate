@@ -96,7 +96,11 @@ function App() {
     },
     {
       path: "/admin-dashboard",
-      element: <Admin />,
+      element: (
+        <AdminProtectedRoute>
+          <Admin />
+        </AdminProtectedRoute>
+      ),
       children: [
         {
           path: "/admin-dashboard",

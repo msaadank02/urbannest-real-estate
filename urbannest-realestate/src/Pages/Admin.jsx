@@ -11,7 +11,7 @@ import { UserContext } from "../../context/userContext";
 const Admin = () => {
   const { setUser } = useContext(UserContext);
   const navigate = useNavigate();
-  const [expand, setExpand] = useState(true);
+  const [expand, setExpand] = useState(false);
 
   const profileItems = [
     {
