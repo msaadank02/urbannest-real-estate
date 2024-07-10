@@ -1,18 +1,7 @@
 const express = require('express')
 const router = express.Router()
-const cors = require('cors')
 const { test, registerUser, loginUser, getProfile, logoutUser, generateOtp, resetPassword, testEmail, verifyOtp, googleAuth, getAllUsers, deleteUsers, protectAdmin, getUserById } = require('../controllers/authController')
 const {authMiddleware} = require('../middlewares/authMiddleware')
-// const {registerMail} = require('../controllers/mailer')
-
-//middleware
-router.use(
-    cors({
-        credentials: true,
-        origin: 'http://localhost:5173',
-        methods: ['POST', 'GET', 'PUT', 'PATCH', 'DELETE']
-    })
-)
 
 // router.get('/', test)
 router.post('/register', registerUser)

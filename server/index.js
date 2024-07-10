@@ -15,9 +15,17 @@ mongoose.connect(process.env.MONGO_URL)
 const app = express();
 
 //middleware
+app.use(
+    cors({
+        credentials: true,
+        origin: 'http://localhost:5173',
+        methods: ['POST', 'GET', 'PUT', 'PATCH', 'DELETE']
+    })
+)
 app.use(express.json())
 app.use(cookieParser())
 app.use(express.urlencoded({extended: false}))
+
 
 app.use('/', require('./Routes/authRoutes'))
 app.use('/', require('./Routes/sellerRoutes'))
@@ -26,6 +34,7 @@ app.use('/', require('./Routes/chatRoutes'))
 app.use('/', require('./Routes/messageRoutes'))
 app.use('/', require('./Routes/notificationRoutes'))
 
+app.get('/favicon.ico', (req, res) => res.status(204));
 // ---------------------- Deployment Code ----------------------
 
 // const __dirname1 = path.dirname(__dirname);
@@ -44,10 +53,8 @@ app.use('/', require('./Routes/notificationRoutes'))
 
 // ---------------------- Deployment Code ^ ----------------------
 
-const port = 8000;
+const port = process.env.PORT || 8080;
 const server = app.listen(port, () => console.log(`Server is running on port ${port}`))
-
-
 
 const io = require("socket.io")(server, {
   pingTimeout: 60000,
